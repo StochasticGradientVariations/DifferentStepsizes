@@ -73,6 +73,13 @@ def run_adgd(net, n_epoch=2, amplifier=0.02, damping=1, weight_decay=0, eps=1e-8
             loss = criterion(outputs, labels)
             loss.backward()
 
+            # ——————— Εδώ προσθέτουμε την εκτύπωση ———————
+            if i % 10 == 0:
+                lr = optimizer.param_groups[0]['lr']
+                print(f"[Epoch {epoch:2d} | Step {i:4d}] loss = {loss.item():.4f}, lr = {lr:.5f}")
+            # ————————————————————————————————————————
+
+
             optimizer.compute_dif_norms(prev_optimizer)
             prev_net.load_state_dict(net.state_dict())
             optimizer.step()
