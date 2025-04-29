@@ -4,7 +4,8 @@ import torch
 import time
 
 # from optimizer import Adsgd   την εχω βαλει σε comment
-from optimizer_adgrad import AdsgdAdGrad
+# from optimizer_adgrad import AdsgdAdGrad
+from optimizer_adgrad_nesterov import AdsgdAdGradNesterov
 
 from utils import load_data, accuracy_and_loss, save_results, seed_everything
 
@@ -26,19 +27,30 @@ def run_adgd(net, n_epoch=2, amplifier=0.02, damping=1, weight_decay=0, eps=1e-8
     criterion = torch.nn.CrossEntropyLoss()
     # optimizer = Adsgd(net.parameters(), amplifier=amplifier, damping=damping, weight_decay=weight_decay, eps=eps)
     # prev_optimizer = Adsgd(prev_net.parameters(), weight_decay=weight_decay)
+
+    #For our stepsizes
+    # initial_lr = 1e-2
+    # optimizer = AdsgdAdGrad(
+    #     net.parameters(),
+    #     lr=initial_lr,
+    #     weight_decay=weight_decay,
+    #     tau_rule='original'  # <--- ρητά ορίζουμε τον original κανόνα (για το  k/(k+3) βαζω tau_rule='mod')
+    # )
+    # prev_optimizer = AdsgdAdGrad(
+    #     prev_net.parameters(),
+    #     lr=initial_lr,
+    #     weight_decay=weight_decay,
+    #     tau_rule='original'   #(για το  k/(k+3) βαζω tau_rule='mod')
+    # )
     initial_lr = 1e-2
-    optimizer = AdsgdAdGrad(
-        net.parameters(),
-        lr=initial_lr,
-        weight_decay=weight_decay,
-        tau_rule='original'  # <--- ρητά ορίζουμε τον original κανόνα (για το  k/(k+3) βαζω tau_rule='mod')
-    )
-    prev_optimizer = AdsgdAdGrad(
-        prev_net.parameters(),
-        lr=initial_lr,
-        weight_decay=weight_decay,
-        tau_rule='original'   #(για το  k/(k+3) βαζω tau_rule='mod')
-    )
+    optimizer = AdsgdAdGradNesterov(net.parameters(),
+                                    lr=initial_lr,
+                                    weight_decay=weight_decay,
+                                    tau_rule='original')  # ή 'mod'
+    prev_optimizer = AdsgdAdGradNesterov(prev_net.parameters(),
+                                         lr=initial_lr,
+                                         weight_decay=weight_decay,
+                                         tau_rule='original')
 
     for epoch in range(n_epoch):  # loop over the dataset multiple times
 
