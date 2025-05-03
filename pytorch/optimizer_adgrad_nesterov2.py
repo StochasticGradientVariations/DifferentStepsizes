@@ -1,94 +1,56 @@
+# optimizer_adgrad_nesterov2.py
+
 import torch
 import numpy as np
 from torch.optim.optimizer import Optimizer, required
 
 class AdsgdAdGradNesterov2(Optimizer):
     """
-    Adaptive SGD + Nesterov momentum + ad_grad step-size.
-    - tau1: original or modified rule
-    - επιτρέπει set_tau2() για εξωτερικό override του τ₂
+    AdGrad2 + Nesterov momentum.
     """
-    def __init__(self, params, lr=1e-6, weight_decay=0, tau_rule='original', momentum=0.0):
-        if lr is not required and lr < 0:
-            raise ValueError(f"Invalid lr: {lr}")
-        if weight_decay < 0:
-            raise ValueError(f"Invalid weight_decay: {weight_decay}")
-        if tau_rule not in ('original', 'mod'):
-            raise ValueError(f"Invalid tau_rule: {tau_rule}")
-        if not 0.0 <= momentum < 1.0:
-            raise ValueError(f"Invalid momentum: {momentum}")
+    def __init__(self, params, lr=1e-3, weight_decay=0.0,
+                 tau_rule='original', momentum=0.0):
         defaults = dict(lr=lr, weight_decay=weight_decay,
                         tau_rule=tau_rule, momentum=momentum)
         super().__init__(params, defaults)
 
-    def __setstate__(self, state):
-        super().__setstate__(state)
-        for g in self.param_groups:
-            g.setdefault('lr', 1e-6)
-            g.setdefault('weight_decay', 0)
-            g.setdefault('tau_rule', 'original')
-            g.setdefault('momentum', 0.0)
-
     def set_tau2(self, tau2: float):
-        """Override τ₂ (που θα χρησιμοποιηθεί στο επόμενο step)."""
         for g in self.param_groups:
             g['lr'] = tau2
-            st = self.state.setdefault(id(g), {})
-            st['la_old'] = tau2
+            self.state[id(g)]['la_old'] = tau2
 
     def step(self, closure=None):
         loss = None
-        if closure:
-            loss = closure()
+        if closure: loss = closure()
+
         for group in self.param_groups:
             state = self.state.setdefault(id(group), {})
-
-            # init counter & last-la
-            if 'k' not in state:
-                state['k']      = 1
-                state['la_old'] = group['lr']
-            else:
-                state['k'] += 1
-
-            k      = state['k']
-            la_old = state['la_old']
+            k      = state.get('k',0) + 1
+            la_old = state.get('la_old', group['lr'])
             rule   = group['tau_rule']
             mu     = group['momentum']
+            state['k'] = k
 
-            # υπολογισμός τ₁
-            if rule == 'mod':
-                tau1 = k/(k+3) * la_old
-            else:
-                tau1 = (k+1)/k * la_old
-
-            # τ₂ έχει είτε οριστεί από set_tau2, είτε είναι ίσο με τ₁
+            tau1 = (k+1)/k*la_old if rule=='original' else k/(k+3)*la_old
             tau2 = group['lr']
-
-            # νέο βήμα = min(τ₁, τ₂)
             la_new = min(tau1, tau2)
             state['la_old'] = la_new
 
-            wd = group['weight_decay']
-            # ensure one buffer per param
+            # ensure one buffer per parameter
             if 'momentum_buffer' not in state:
-                state['momentum_buffer'] = [
-                    torch.zeros_like(p.data) for p in group['params']
-                ]
+                state['momentum_buffer'] = [torch.zeros_like(p.data) for p in group['params']]
 
-            # Nesterov momentum update per param
-            for idx, p in enumerate(group['params']):
-                if p.grad is None:
-                    continue
+            wd = group['weight_decay']
+            for idx,p in enumerate(group['params']):
+                if p.grad is None: continue
                 d_p = p.grad.data
-                if wd != 0:
-                    d_p = d_p.add(wd, p.data)
+                if wd!=0: d_p = d_p.add(wd, p.data)
 
-                buf = state['momentum_buffer'][idx]  # retrieve correct buffer
+                buf = state['momentum_buffer'][idx]
                 v_prev = buf.clone()
-
-                # buf ← μ·buf + la_new·∇
                 buf.mul_(mu).add_(d_p, alpha=la_new)
-                # p ← p - μ·v_prev - la_new·∇ (Nesterov)
+
+                # Nesterov update:
                 p.data.add_(v_prev, alpha=-mu).add_(d_p, alpha=-la_new)
 
             group['lr'] = la_new
