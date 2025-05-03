@@ -1,5 +1,3 @@
-# optimizer_adgrad_nesterov2.py
-#“Introduces Nesterov momentum updates combined with the ad_grad step‐size rule for smoother, accelerated convergence by leveraging both curvature‐based learning rates and lookahead momentum.”
 import torch
 import numpy as np
 from torch.optim.optimizer import Optimizer, required
@@ -34,9 +32,7 @@ class AdsgdAdGradNesterov2(Optimizer):
     def set_tau2(self, tau2: float):
         """Override τ₂ (που θα χρησιμοποιηθεί στο επόμενο step)."""
         for g in self.param_groups:
-            # Ορίζουμε προσωρινά τον ρυθμό στο τ₂
             g['lr'] = tau2
-            # Και το κρατάμε σαν παλιό βήμα ώστε το επόμενο tau1 να το χρησιμοποιήσει
             st = self.state.setdefault(id(g), {})
             st['la_old'] = tau2
 
@@ -73,22 +69,26 @@ class AdsgdAdGradNesterov2(Optimizer):
             state['la_old'] = la_new
 
             wd = group['weight_decay']
-            # Nesterov momentum update:
-            # v ← μ·v + la_new·g
-            # p ← p - μ·v_prev - la_new·g
-            for p in group['params']:
+            # ensure one buffer per param
+            if 'momentum_buffer' not in state:
+                state['momentum_buffer'] = [
+                    torch.zeros_like(p.data) for p in group['params']
+                ]
+
+            # Nesterov momentum update per param
+            for idx, p in enumerate(group['params']):
                 if p.grad is None:
                     continue
                 d_p = p.grad.data
                 if wd != 0:
                     d_p = d_p.add(wd, p.data)
 
-                # buffer στο state για το momentum
-                buf = state.setdefault('momentum_buffer', torch.zeros_like(p.data))
+                buf = state['momentum_buffer'][idx]  # retrieve correct buffer
                 v_prev = buf.clone()
-                buf.mul_(mu).add_(d_p, alpha=la_new)
 
-                # actual Nesterov update:
+                # buf ← μ·buf + la_new·∇
+                buf.mul_(mu).add_(d_p, alpha=la_new)
+                # p ← p - μ·v_prev - la_new·∇ (Nesterov)
                 p.data.add_(v_prev, alpha=-mu).add_(d_p, alpha=-la_new)
 
             group['lr'] = la_new
