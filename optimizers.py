@@ -747,3 +747,73 @@ class AdgdHybrid2(Trainer):
         if not hasattr(self, 'lrs'):
             self.lrs = []
         self.lrs.append(self.lr)
+
+
+class ADPG_Momentum(Trainer):
+    """
+    Adaptive GD + Nesterov momentum με:
+      – βήμα γ_k = min((k+1)/k * γ_{k-1}, 0.5 / L_loc)
+      – look‐ahead y^k = x^k + (k/(k+3))*(x^k - x^{k-1})
+      – update x^{k+1} = y^k - γ_k * ∇f(y^k)
+    """
+    def __init__(self, lr0=None, *args, **kwargs):
+        super(ADPG_Momentum, self).__init__(*args, **kwargs)
+        self.lr0 = lr0
+
+    def init_run(self, w0):
+        # 1) θεμέλιο init
+        super(ADPG_Momentum, self).init_run(w0)
+
+        # 2) αρχικό βήμα
+        self.lr = self.lr0 if self.lr0 is not None else 1e-6
+
+        # 3) πρώτος gradient & αρχικοποίηση grad, grad_old
+        g0 = self.grad_func(self.w)
+        self.grad_old = g0.copy()
+        self.grad     = g0.copy()
+
+        # 4) αποθήκευση παλαιάς θέσης
+        self.x_old = self.w.copy()
+
+        # 5) πρώτος απλός βηματισμός
+        self.w -= self.lr * g0
+        self.save_checkpoint()
+
+    def estimate_stepsize(self):
+        k = max(1, self.it)
+        # curvature estimate
+        diff_x = self.w - self.x_old
+        diff_g = self.grad - self.grad_old
+        L_loc  = la.norm(diff_g) / (la.norm(diff_x) + 1e-12)
+        # κανόνες για το γ
+        tau1 = (k+1)/k * self.lr
+        tau2 = 0.5 / L_loc
+        self.lr = min(tau1, tau2)
+
+    def step(self):
+        # 1) υπολογίζουμε grad στο τρέχον x
+        gk = self.grad_func(self.w)
+        self.grad = gk.copy()
+
+        # 2) εκτιμούμε το καινούριο βήμα
+        self.estimate_stepsize()
+
+        # 3) υπολογισμός momentum συντελεστή
+        k = max(1, self.it)
+        m = k / (k + 3)
+
+        # 4) look‐ahead
+        yk = self.w + m * (self.w - self.x_old)
+
+        # 5) αποθήκευση για την επόμενη iter
+        self.x_old    = self.w.copy()
+        self.grad_old = gk.copy()
+
+        # 6) τελική ενημέρωση
+        x_new = yk - self.lr * self.grad_func(yk)
+
+        # 7) Ενημέρωση της κατάστασης του Trainer
+        self.w = x_new
+        self.save_checkpoint()
+
+        return x_new

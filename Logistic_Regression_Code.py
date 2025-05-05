@@ -1,5 +1,3 @@
-# Logistic_Regression_Code.py
-
 import os
 
 import numpy as np
@@ -17,7 +15,9 @@ from optimizers import (
     AdgdK1OverK,
     AdgdKOverKplus3,
     AdaptiveGDK1onKNesterov,
-    AdgdHybrid                # <-- προστέθηκε
+    AdgdHybrid,
+    AdgdHybrid2,
+    ADPG_Momentum               # ← προστέθηκε
 )
 from loss_functions import logistic_loss, logistic_gradient
 
@@ -65,35 +65,49 @@ def main():
     )
 
     # ─── Οι δικές μας παραλλαγές ───────────────────────────────────────
-    opt_k1   = AdgdK1OverK(
+    opt_k1      = AdgdK1OverK(
         lr0=1/L,
         loss_func=lambda w: logistic_loss(w, X, y, l2),
         grad_func=lambda w: logistic_gradient(w, X, y, l2),
         it_max=it_max
     )
-    opt_k3   = AdgdKOverKplus3(
+    opt_k3      = AdgdKOverKplus3(
         lr0=1/L,
         loss_func=lambda w: logistic_loss(w, X, y, l2),
         grad_func=lambda w: logistic_gradient(w, X, y, l2),
         it_max=it_max
     )
-    opt_nes  = AdaptiveGDK1onKNesterov(
+    opt_nes     = AdaptiveGDK1onKNesterov(
         lr0=1/L,
         loss_func=lambda w: logistic_loss(w, X, y, l2),
         grad_func=lambda w: logistic_gradient(w, X, y, l2),
         it_max=it_max
     )
-    hybrid   = AdgdHybrid(                      # <-- νέα μέθοδος
+    hybrid1     = AdgdHybrid(
+        lr0=1/L, b_lr=0.5, b_mu=0.5,
+        loss_func=lambda w: logistic_loss(w, X, y, l2),
+        grad_func=lambda w: logistic_gradient(w, X, y, l2),
+        it_max=it_max
+    )
+    hybrid2     = AdgdHybrid2(
+        lr0=1/L, b_lr=0.5, b_mu=0.5,
+        loss_func=lambda w: logistic_loss(w, X, y, l2),
+        grad_func=lambda w: logistic_gradient(w, X, y, l2),
+        it_max=it_max
+    )
+    adpg_mom    = ADPG_Momentum(        # ← προστέθηκε
         lr0=1/L,
-        b_lr=0.5,
-        b_mu=0.5,
         loss_func=lambda w: logistic_loss(w, X, y, l2),
         grad_func=lambda w: logistic_gradient(w, X, y, l2),
         it_max=it_max
     )
 
     # ─── Τρέξιμο όλων ─────────────────────────────────────────────────
-    numpy_opts  = [gd, nest, adgd, ad_acc, opt_k1, opt_k3, opt_nes, hybrid]
+    numpy_opts  = [
+        gd, nest, adgd, ad_acc,
+        opt_k1, opt_k3, opt_nes,
+        hybrid1, hybrid2, adpg_mom     # ← εδώ
+    ]
     labels_npy  = [
         'GD',
         'Nesterov',
@@ -102,9 +116,15 @@ def main():
         'AdGD (k+1)/k',
         'AdGD (k/(k+3))',
         'AdGD (k+1)/k + Nesterov',
-        'AdGD Hybrid'              # <-- label για τη νέα μέθοδο
+        'AdGD Hybrid v1',
+        'AdGD Hybrid v2',
+        'ADPG_Momentum'                # ← label για το νέο
     ]
-    markers_npy = [',', 'o', '*', '^', '<', '>', 'x', 'd']  # 'd' = diamond marker
+    markers_npy = [
+        ',', 'o', '*', '^',
+        '<', '>', 'x',
+        'd', 'D', 'h'                  # 'h' = hexagon marker
+    ]
 
     for opt in numpy_opts:
         opt.run(w0.copy())
