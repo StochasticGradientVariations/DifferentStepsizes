@@ -571,3 +571,179 @@ class AdaptiveGDK1onKNesterov(Trainer):
 
         return w_new
 
+class AdgdHybrid(Trainer):
+    """
+    Hybrid adaptive gradient descent:
+      - βήμα με τ1 = (k+1)/k · η_{k−1}, τ2 = b_lr / L_loc
+      - τοπική εκτίμηση μ_k = min((k+1)/k · μ_{k−1}, b_mu * L_loc)
+      - Nesterov‐τύπου momentum με β_k = (1/η_k − μ_k)/(1/η_k + μ_k)
+
+    Arguments:
+      lr0 (float, optional): αρχικό βήμα (default: 1e-10)
+      b_lr (float, optional): scaling παράγοντας για το curvature‐bound στο βήμα (default: 0.5)
+      b_mu (float, optional): scaling παράγοντας για το curvature‐bound στο μ (default: 0.5)
+    """
+    def __init__(self, lr0=None, b_lr=0.5, b_mu=0.5, *args, **kwargs):
+        super(AdgdHybrid, self).__init__(*args, **kwargs)
+        self.lr0 = lr0
+        self.b_lr = b_lr
+        self.b_mu = b_mu
+
+    def init_run(self, w0):
+        super(AdgdHybrid, self).init_run(w0)
+        # αρχικό learning rate
+        if self.lr0 is None:
+            self.lr0 = 1e-10
+        self.lr = self.lr0
+        # αρχική μ
+        self.mu = 1.0 / self.lr
+        # curvature state
+        grad = self.grad_func(self.w)
+        self.grad = grad
+        self.w_old    = self.w.copy()
+        self.grad_old = grad
+        # για Nesterov: y_prev
+        self.y_prev = self.w.copy()
+        # πρώτο βήμα (GD)
+        self.w -= self.lr * grad
+        self.save_checkpoint()
+
+    def estimate_stepsize(self):
+        k = max(1, self.it)
+        # τοπικός L_loc
+        denom = la.norm(self.w - self.w_old) + 1e-12
+        L_loc = la.norm(self.grad - self.grad_old) / denom
+        # τ1 rule
+        tau1 = (k+1)/k * self.lr
+        # τ2 curvature‐bound
+        tau2 = self.b_lr / L_loc
+        lr_new = min(tau1, tau2)
+        # αντίστοιχα για μ
+        mu1 = (k+1)/k * self.mu
+        mu2 = self.b_mu * L_loc
+        mu_new = min(mu1, mu2)
+        # ενημέρωση
+        self.lr = lr_new
+        self.mu = mu_new
+
+    def step(self):
+        # ξαναϋπολογίζουμε grad στο τρέχον w
+        self.grad = self.grad_func(self.w)
+        # momentum coefficient
+        beta = (1.0/self.lr - self.mu) / (1.0/self.lr + self.mu)
+        # αποθηκεύουμε παλιές τιμές
+        self.w_old      = self.w.copy()
+        self.grad_old   = self.grad.copy()
+        y_old = self.y_prev.copy()
+        # look‐ahead GD
+        y = self.w - self.lr * self.grad
+        # Nesterov‐update
+        w_new = y + beta * (y - y_old)
+        # ενημέρωση y_prev
+        self.y_prev = y
+        return w_new
+
+    def update_logs(self):
+        super(AdgdHybrid, self).update_logs()
+        # κρατάμε και τα lr αν θέλουμε να τα βλέπουμε
+        if not hasattr(self, 'lrs'):
+            self.lrs = []
+        self.lrs.append(self.lr)
+
+
+class AdgdHybrid2(Trainer):
+    """
+    Hybrid adaptive gradient descent v2:
+      1) βήμα: η_k = min( sqrt(1+theta_lr)*η_{k-1},
+                           (k+1)/k*η_{k-1},
+                           b_lr / L_loc )
+      2) τοπική mu_k = min( sqrt(1+theta_mu)*μ_{k-1},
+                              b_mu * L_loc )
+      3) momentum: beta_k = (1/η_k - μ_k) / (1/η_k + μ_k)
+
+    Arguments:
+      lr0 (float, optional): αρχικό βήμα (default: 1e-10)
+      b_lr (float, optional): scaling παράγοντας για τ2 στο βήμα (default: 0.5)
+      b_mu (float, optional): scaling παράγοντας για bound στο μ (default: 0.5)
+    """
+    def __init__(self, lr0=None, b_lr=0.5, b_mu=0.5, *args, **kwargs):
+        super(AdgdHybrid2, self).__init__(*args, **kwargs)
+        self.lr0  = lr0
+        self.b_lr = b_lr
+        self.b_mu = b_mu
+
+    def init_run(self, w0):
+        super(AdgdHybrid2, self).init_run(w0)
+        # αρχικό learning rate
+        if self.lr0 is None:
+            self.lr0 = 1e-10
+        self.lr      = self.lr0
+        self.theta_lr = np.inf
+        # αρχική mu
+        self.mu       = 1.0/self.lr
+        self.theta_mu = np.inf
+
+        # curvature‐state
+        grad = self.grad_func(self.w)
+        self.grad     = grad
+        self.w_old    = self.w.copy()
+        self.grad_old = grad
+
+        # για Nesterov
+        self.y_prev = self.w.copy()
+
+        # πρώτο βήμα
+        self.w -= self.lr * grad
+        self.save_checkpoint()
+
+    def estimate_stepsize(self):
+        k = max(1, self.it)
+        # curvature estimate
+        denom = la.norm(self.w - self.w_old) + 1e-12
+        L_loc = la.norm(self.grad - self.grad_old) / denom
+
+        # (α) γεωμετρική αύξηση
+        tau_g = np.sqrt(1 + self.theta_lr) * self.lr
+        # (β) γραμμική αύξηση
+        tau_l = (k+1)/k * self.lr
+        # curvature‐bound
+        tau_c = self.b_lr / L_loc
+        # νέο lr
+        lr_new = min(tau_g, tau_l, tau_c)
+        self.theta_lr = lr_new / self.lr
+        self.lr       = lr_new
+
+        # τώρα το τοπικό mu
+        mu_g = np.sqrt(1 + self.theta_mu) * self.mu
+        mu_c = self.b_mu * L_loc
+        mu_new = min(mu_g, mu_c)
+        self.theta_mu = mu_new / self.mu
+        self.mu       = mu_new
+
+    def step(self):
+        # ξαναϋπολογίζουμε grad
+        self.grad = self.grad_func(self.w)
+
+        # υπολογίζουμε beta
+        beta = (1.0/self.lr - self.mu) / (1.0/self.lr + self.mu)
+
+        # αποθηκεύουμε παλιές τιμές
+        self.w_old    = self.w.copy()
+        self.grad_old = self.grad.copy()
+        y_old         = self.y_prev.copy()
+
+        # look‐ahead GD
+        y = self.w - self.lr * self.grad
+        # Nesterov‐update
+        w_new = y + beta * (y - y_old)
+
+        # ενημέρωση για την επόμενη επανάληψη
+        self.y_prev = y
+        return w_new
+
+    def update_logs(self):
+        super(AdgdHybrid2, self).update_logs()
+        # αν θέλεις να κρατάς και ιστορικό των βημάτων
+        if not hasattr(self, 'lrs'):
+            self.lrs = []
+        self.lrs.append(self.lr)
