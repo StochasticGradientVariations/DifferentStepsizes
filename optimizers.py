@@ -127,11 +127,12 @@ class AdgdAccel(Trainer):
         self.b_mu = b_mu
         
     def estimate_stepsize(self):
-        L = la.norm(self.grad - self.grad_old) / la.norm(self.w - self.w_old)
+        denom = la.norm(self.w - self.w_old)
+        L = la.norm(self.grad - self.grad_old) / (denom + 1e-12)
         lr_new = min(np.sqrt(1 + self.a_lr * self.theta_lr) * self.lr, self.b_lr / L)
         self.theta_lr = lr_new / self.lr
         self.lr = lr_new
-        mu_new = min(np.sqrt(1 + self.a_mu * self.theta_mu) * self.mu, self.b_lr * L)
+        mu_new = min(np.sqrt(1 + self.a_mu * self.theta_mu) * self.mu,self.b_mu * L)
         self.theta_mu = mu_new / self.mu
         self.mu = mu_new
         
@@ -816,4 +817,238 @@ class ADPG_Momentum(Trainer):
         self.w = x_new
         self.save_checkpoint()
 
+        return x_new
+
+
+class ADPG_Momentum2(Trainer):
+    """
+    Adaptive GD + Nesterov momentum v2 με:
+      – global safeguard: lr ≤ 1/L_global
+      – τ1 = (k+1)/k · lr_prev
+      – τ2 = 0.5 / L_loc (με L_loc ≥ 1e-3·L_global)
+      – γεωμετρική αύξηση τ_geom = sqrt(1+θ_lr)·lr_prev
+      – lr_new = min(τ1, τ2, τ_geom, 1/L_global)
+      – momentum m = k/(k+3)
+      – look-ahead y^k = x^k + m·(x^k − x^{k−1})
+      – update x^{k+1} = y^k − lr_new·∇f(y^k)
+    """
+    def __init__(self, lr0=None, *args, **kwargs):
+        super(ADPG_Momentum2, self).__init__(*args, **kwargs)
+        self.lr0 = lr0
+
+    def init_run(self, w0):
+        super(ADPG_Momentum2, self).init_run(w0)
+        # αρχικό βήμα και global bound = 1/L_global
+        self.lr         = self.lr0 if self.lr0 is not None else 1e-6
+        self.gamma_max  = self.lr   # = 1/L_global
+        self.theta_lr   = np.inf
+
+        # init grad & ιστορικό x_old
+        g0             = self.grad_func(self.w)
+        self.grad_old  = g0.copy()
+        self.grad      = g0.copy()
+        self.x_old     = self.w.copy()
+
+        # πρώτο απλό βήμα
+        self.w        -= self.lr * g0
+        self.save_checkpoint()
+
+    def estimate_stepsize(self):
+        k = max(1, self.it)
+        # curvature
+        dx    = self.w - self.x_old
+        dg    = self.grad - self.grad_old
+        L_loc = np.linalg.norm(dg) / (np.linalg.norm(dx) + 1e-12)
+        L_loc = max(L_loc, 1.0/self.gamma_max * 1e-3)
+
+        # κανόνες βήματος
+        tau1   = (k+1)/k * self.lr
+        tau2   = 0.5       / L_loc
+        tau_g  = np.sqrt(1 + self.theta_lr) * self.lr
+
+        # νέο lr με global safeguard
+        new_lr      = min(tau1, tau2, tau_g, self.gamma_max)
+        self.theta_lr = new_lr / self.lr
+        self.lr      = new_lr
+
+    def step(self):
+        # update grad
+        gk           = self.grad_func(self.w)
+        self.grad    = gk.copy()
+
+        # επανεκτίμηση βήματος
+        self.estimate_stepsize()
+
+        # momentum & look-ahead
+        k           = max(1, self.it)
+        m           = k/(k+3)
+        yk          = self.w + m * (self.w - self.x_old)
+
+        # store history
+        self.x_old  = self.w.copy()
+        self.grad_old = gk.copy()
+
+        # τελικό update
+        x_new       = yk - self.lr * self.grad_func(yk)
+
+        # ενημέρωση Trainer
+        self.w      = x_new
+        self.save_checkpoint()
+
+        return x_new
+
+
+class ADPG_Momentum3(Trainer):
+    """
+    Adaptive GD + Nesterov momentum v3 με:
+      – global safeguard: lr ≤ 1/L_global
+      – τ1 = (k+1)/k · lr_prev
+      – τ2 = 0.5 / L_loc, με L_loc ≥ L_global·1e-3
+      – γεωμετρική αύξηση τ_geom = sqrt(1+θ_lr)·lr_prev
+      – lr_new = min(τ1, τ2, τ_geom, 1/L_global)
+      – momentum m = k/(k+3)
+      – look-ahead y^k = x^k + m·(x^k − x^{k−1})
+      – update x^{k+1} = y^k − lr_new·∇f(y^k)
+    """
+    def __init__(self, lr0=None, L_global=None, *args, **kwargs):
+        super(ADPG_Momentum3, self).__init__(*args, **kwargs)
+        self.lr0      = lr0
+        # πρέπει να δώσετε το global Lipschitz L_global
+        self.L_global = L_global
+
+    def init_run(self, w0):
+        super(ADPG_Momentum3, self).init_run(w0)
+        # 1) αρχικό βήμα & global cap
+        if self.lr0 is None:
+            raise ValueError("Πρέπει να δώσετε lr0=1/L_global")
+        self.lr         = self.lr0
+        self.gamma_max  = self.lr0    # = 1/L_global
+        self.theta_lr   = np.inf
+
+        # 2) init history για curvature
+        g0             = self.grad_func(self.w)
+        self.grad_old  = g0.copy()
+        self.grad      = g0.copy()
+        self.x_old     = self.w.copy()
+
+        # 3) πρώτο απλό step
+        self.w        -= self.lr * g0
+        self.save_checkpoint()
+
+    def estimate_stepsize(self):
+        k = max(1, self.it)
+        # 1) τοπική curvature
+        dx    = self.w - self.x_old
+        dg    = self.grad - self.grad_old
+        L_loc = la.norm(dg) / (la.norm(dx) + 1e-12)
+        # κατώφλι για να μην πέσει πολύ χαμηλά
+        L_loc = max(L_loc, self.L_global * 1e-3)
+
+        # 2) οι τρεις κανόνες
+        tau1  = (k+1)/k * self.lr
+        tau2  = 0.5      / L_loc
+        tau_g = np.sqrt(1 + self.theta_lr) * self.lr
+
+        # 3) global safeguard
+        new_lr      = min(tau1, tau2, tau_g, self.gamma_max)
+        self.theta_lr = new_lr / self.lr
+        self.lr      = new_lr
+
+    def step(self):
+        # 1) ξαναϋπολογισμός gradient
+        gk           = self.grad_func(self.w)
+        self.grad    = gk.copy()
+
+        # 2) update βήμα
+        self.estimate_stepsize()
+
+        # 3) Nesterov momentum
+        k    = max(1, self.it)
+        m    = k/(k+3)
+        yk   = self.w + m * (self.w - self.x_old)
+
+        # 4) save history for next curvature
+        self.x_old    = self.w.copy()
+        self.grad_old = gk.copy()
+
+        # 5) final update at yk
+        x_new = yk - self.lr * self.grad_func(yk)
+
+        # 6) update Trainer state
+        self.w = x_new
+        self.save_checkpoint()
+        return x_new
+
+class ADPG_Momentum4(Trainer):
+    """
+    Adaptive GD + Nesterov momentum v4:
+      – global safeguard: lr ≤ 1/L_global
+      – τ1 = (k+1)/k · lr_prev
+      – τ2 = 0.5 / L_loc_avg, with L_loc_avg = ρ·L_loc_avg_prev + (1-ρ)·L_loc
+      – τ_geom = sqrt(1+θ_lr)·lr_prev
+      – lr_new = min(τ1, τ2, τ_geom, 1/L_global)
+      – momentum m = k/(k+3)
+      – look-ahead y^k = x^k + m·(x^k − x^{k−1})
+      – update x^{k+1} = y^k − lr_new·∇f(y^k)
+    """
+    def __init__(self, lr0=None, L_global=None, rho=0.95, *args, **kwargs):
+        super(ADPG_Momentum4, self).__init__(*args, **kwargs)
+        if lr0 is None or L_global is None:
+            raise ValueError("Δώστε lr0=1/L_global και L_global")
+        self.lr0      = lr0
+        self.L_global = L_global
+        self.gamma_max = lr0      # = 1/L_global
+        self.rho      = rho       # decay for L_loc smoothing
+
+    def init_run(self, w0):
+        super(ADPG_Momentum4, self).init_run(w0)
+        # 1) αρχικό lr
+        self.lr        = self.lr0
+        self.theta_lr  = np.inf
+        # 2) init history
+        g0            = self.grad_func(self.w)
+        self.grad_old = g0.copy()
+        self.grad     = g0.copy()
+        self.x_old    = self.w.copy()
+        # 3) init smoothed L_loc
+        self.L_loc_avg = 1.0 / self.lr0  # initial guess
+        # 4) πρώτο απλό βήμα
+        self.w       -= self.lr * g0
+        self.save_checkpoint()
+
+    def estimate_stepsize(self):
+        k = max(1, self.it)
+        # a) τοπική εκτίμηση curvature
+        dx    = self.w - self.x_old
+        dg    = self.grad - self.grad_old
+        L_loc = np.linalg.norm(dg) / (np.linalg.norm(dx) + 1e-12)
+        # b) smoothing με running average
+        self.L_loc_avg = self.rho * self.L_loc_avg + (1 - self.rho) * L_loc
+        # c) κανόνες βήματος
+        tau1  = (k+1)/k * self.lr
+        tau2  = 0.5       / self.L_loc_avg
+        tau_g = np.sqrt(1 + self.theta_lr) * self.lr
+        # d) global safeguard
+        new_lr       = min(tau1, tau2, tau_g, self.gamma_max)
+        self.theta_lr = new_lr / self.lr
+        self.lr       = new_lr
+
+    def step(self):
+        # 1) υπολογισμός gradient
+        gk           = self.grad_func(self.w)
+        self.grad    = gk.copy()
+        # 2) επανεκτίμηση βήματος
+        self.estimate_stepsize()
+        # 3) momentum look-ahead
+        k    = max(1, self.it)
+        m    = k/(k+3)
+        yk   = self.w + m * (self.w - self.x_old)
+        # 4) save history
+        self.x_old    = self.w.copy()
+        self.grad_old = gk.copy()
+        # 5) τελική ενημέρωση
+        x_new = yk - self.lr * self.grad_func(yk)
+        # 6) checkpoint
+        self.w = x_new
+        self.save_checkpoint()
         return x_new
