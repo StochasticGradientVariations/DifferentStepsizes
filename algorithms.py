@@ -12,43 +12,50 @@ def safe_division(x, y):
     return np.exp(np.log(x) - np.log(y)) if y != 0 else 1e16
 
 
-# def ad_grad(J, df, x0, la_0=1e-6, numb_iter=100):
-#     """
-#     Minimize f(x) by adaptive gradient method.
-#     Takes J as some evaluation function for comparison.
-#
-#     """
-#     begin = perf_counter()
-#     x_old = x0
-#     grad_old = df(x0)
-#     x = x0 - la_0 * grad_old
-#     la_old = 1
-#     th = 1e9
-#     steps_array = []
-#     values = [J(grad_old)]
-#
-#     for i in range(numb_iter):
-#         grad = df(x)
-#         norm_x = LA.norm(x - x_old)
-#         norm_grad = LA.norm(grad - grad_old)
-#         #la = min(np.sqrt(1 + th) * la_old,  0.5 * norm_x / norm_grad)
-#         la = min(np.sqrt(1 + th) * la_old,  0.5 * safe_division(norm_x, norm_grad))
-#         th = la / la_old
-#         x_old = x.copy()
-#         x -= la * grad
-#         la_old = la
-#         grad_old = grad
-#         values.append(J(grad))
-#         steps_array.append(la)
-#     end = perf_counter()
-#
-#     print("Time execution of adaptive gradient descent:", end - begin)
-#     return values, x, steps_array
-
 def ad_grad(J, df, x0, la_0=1e-6, numb_iter=100):
+    """
+    Minimize f(x) by adaptive gradient method.
+    Takes J as some evaluation function for comparison.
+     Original adaptive GD:
+      - τ1 = sqrt((1+θ_prev) * λ_prev)
+      - τ2 = 0.5 * ||x_k - x_{k-1}|| / ||∇f(x_k) - ∇f(x_{k-1})||
+    Returns: values history, final x, steps history
+
+    """
+    begin = perf_counter()
+    x_old = x0
+    grad_old = df(x0)
+    x = x0 - la_0 * grad_old
+    la_old = 1
+    th = 1e9
+    steps_array = []
+    values = [J(grad_old)]
+
+    for i in range(numb_iter):
+        grad = df(x)
+        norm_x = LA.norm(x - x_old)
+        norm_grad = LA.norm(grad - grad_old)
+        #la = min(np.sqrt(1 + th) * la_old,  0.5 * norm_x / norm_grad)
+        la = min(np.sqrt(1 + th) * la_old,  0.5 * safe_division(norm_x, norm_grad))
+        th = la / la_old
+        x_old = x.copy()
+        x -= la * grad
+        la_old = la
+        grad_old = grad
+        values.append(J(grad))
+        steps_array.append(la)
+    end = perf_counter()
+
+    print("Time execution of adaptive gradient descent:", end - begin)
+    return values, x, steps_array
+
+def ad_grad_k1_over_k(J, df, x0, la_0=1e-6, numb_iter=100):
     """
     Minimize f(x) by adaptive gradient method, με τ1 = (k+1)/k * la_old
     και τ2 = 0.5 * (norm_x / norm_grad).
+
+    Adaptive GD με τ1 = (k+1)/k * λ_prev και
+    τ2 = 0.5 * ‖x_k - x_{k-1}‖ / ‖∇f(x_k) - ∇f(x_{k-1})‖.
     """
     begin     = perf_counter()
     x_old     = x0.copy()
@@ -79,56 +86,56 @@ def ad_grad(J, df, x0, la_0=1e-6, numb_iter=100):
         steps.append(la)
 
     end = perf_counter()
-    print("Time execution of adaptive gradient descent:", end - begin)
+    print("Time execution of adaptive gradient descent (k+1)/k rule):", end - begin)
     return values, x, steps
 
-# def ad_grad_mod(J, df, x0, la_0=1e-6, numb_iter=100):
-#     """
-#     Minimize f(x) by adaptive gradient method with custom tau1 update (k/(k+3)).
-#     J   : evaluation function (e.g., f(x) or loss)
-#     df  : gradient function df(x) = ∇f(x)
-#     x0  : initial point
-#     la_0: initial small step
-#     numb_iter: number of iterations
-#     Returns: values history, final x, steps history
-#     """
-#     begin = perf_counter()
-#
-#     # Initialization
-#     x_old     = x0.copy()
-#     grad_old  = df(x0)
-#     x         = x0 - la_0 * grad_old
-#     la_old    = la_0
-#
-#     values      = [J(grad_old)]
-#     steps_array = []
-#
-#     # Main loop
-#     for k in range(1, numb_iter + 1):
-#         grad      = df(x)
-#         norm_x    = LA.norm(x - x_old)
-#         norm_grad = LA.norm(grad - grad_old)
-#
-#         # Custom τ1: k/(k+3) * la_old
-#         tau1 = (k) / (k + 3) * la_old
-#         # τ2: local curvature bound with factor 0.5
-#         tau2 = 0.5 * safe_division(norm_x, norm_grad)
-#         la   = min(tau1, tau2)
-#
-#         # Update variables
-#         x_old     = x.copy()
-#         x        -= la * grad
-#         la_old    = la
-#         grad_old  = grad
-#
-#         # Record history
-#         values.append(J(grad))
-#         steps_array.append(la)
-#
-#     end = perf_counter()
-#     print("Time execution with custom tau1 (k/(k+3)) update:", end - begin)
-#
-#     return values, x, steps_array
+def ad_grad_mod(J, df, x0, la_0=1e-6, numb_iter=100):
+    """
+    Minimize f(x) by adaptive gradient method with custom tau1 update (k/(k+3)).
+    J   : evaluation function (e.g., f(x) or loss)
+    df  : gradient function df(x) = ∇f(x)
+    x0  : initial point
+    la_0: initial small step
+    numb_iter: number of iterations
+    Returns: values history, final x, steps history
+    """
+    begin = perf_counter()
+
+    # Initialization
+    x_old     = x0.copy()
+    grad_old  = df(x0)
+    x         = x0 - la_0 * grad_old
+    la_old    = la_0
+
+    values      = [J(grad_old)]
+    steps_array = []
+
+    # Main loop
+    for k in range(1, numb_iter + 1):
+        grad      = df(x)
+        norm_x    = LA.norm(x - x_old)
+        norm_grad = LA.norm(grad - grad_old)
+
+        # Custom τ1: k/(k+3) * la_old
+        tau1 = (k) / (k + 3) * la_old
+        # τ2: local curvature bound with factor 0.5
+        tau2 = 0.5 * safe_division(norm_x, norm_grad)
+        la   = min(tau1, tau2)
+
+        # Update variables
+        x_old     = x.copy()
+        x        -= la * grad
+        la_old    = la
+        grad_old  = grad
+
+        # Record history
+        values.append(J(grad))
+        steps_array.append(la)
+
+    end = perf_counter()
+    print("Time execution with custom tau1 (k/(k+3)) update:", end - begin)
+
+    return values, x, steps_array
 
 
 def ad_grad_tighter(J, df, x0, la_0=1e-6, numb_iter=100):

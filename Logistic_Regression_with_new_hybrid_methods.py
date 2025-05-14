@@ -35,12 +35,21 @@ def main():
     sns.set(style="whitegrid", font_scale=1.2, context="talk")
     plt.rcParams['mathtext.fontset'] = 'cm'
 
-    # ─── Φόρτωση δεδομένων ──────────────────────────────────────────────
+    # # ─── Φόρτωση δεδομένων ──────────────────────────────────────────────
+    # repo_root = os.path.dirname(__file__)
+    # X_sp, y   = load_svmlight_file(os.path.join(repo_root, 'datasets', 'mushrooms'))
+    # X, y      = X_sp.toarray(), y
+    # if set(np.unique(y)) == {1, 2}:
+    #     y = (y == 2).astype(float)
+
+    # Φόρτωση δεδομένων w8a
     repo_root = os.path.dirname(__file__)
-    X_sp, y   = load_svmlight_file(os.path.join(repo_root, 'datasets', 'mushrooms'))
-    X, y      = X_sp.toarray(), y
-    if set(np.unique(y)) == {1, 2}:
-        y = (y == 2).astype(float)
+    X_sp, y = load_svmlight_file(os.path.join(repo_root, 'datasets', 'w8a'))
+    X, y = X_sp.toarray(), y
+    # Στο w8a οι ετικέτες είναι {-1,+1} → μετατρέπουμε σε {0,1}
+    if set(np.unique(y)) == {-1, 1}:
+        y = ((y + 1) // 2).astype(float)
+
 
     n, d   = X.shape
     # global Lipschitz estimate

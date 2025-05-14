@@ -76,17 +76,56 @@ def logistic_gradient(w, X, y_, l2, normalize=True):
     return grad * len(y)
 
 
-def cubic_loss(w, H, g, M, scale=1):
+def cubic_loss0(w, H, g, M, scale=1):
     """
     Loss values of quadratic with cubic regularization.
     To make M independent of the gradient/Hessian rescaling, we scale it with the last argument.
     """
     return w@g + 0.5*H@w@w + scale*M/6*la.norm(w)**3
 
+def cubic_loss1(w, H, g, M, scale=1):
+    """
+    Loss values of quadratic with cubic regularization.
+    To make M independent of the gradient/Hessian rescaling,
+    we scale only το cubic μέρος με το `scale` argument.
+    """
+    return (
+        w @ g
+        + 0.5 * (w @ (H @ w))
+        + scale * M/6 * np.linalg.norm(w)**3
+    )
+def cubic_loss(w, H, g, M):
+    """
+    Cubic regularization model χωρίς scaling:
+      m(w) = g^T w + 1/2 * w^T H w + (M/6) * ||w||^3    σαν την εργασία του Πατρινού
+    """
+    return float(g @ w) \
+         + 0.5 * float(w @ (H @ w)) \
+         + (M / 6) * np.linalg.norm(w)**3
 
-def cubic_gradient(w, H, g, M, scale=1):
+
+
+def cubic_gradient0(w, H, g, M, scale=1):
     """
     Gradient of quadratic with cubic regularization.
     To make M independent of the gradient/Hessian rescaling, we scale them with the last argument.
     """
     return (g+H@w)/scale + M/2*w*la.norm(w)
+
+def cubic_gradient1(w, H, g, M, scale=1):
+    """
+    Gradient of quadratic with cubic regularization.
+    Το linear+quadratic part διαιρείται με `scale`,
+    το cubic part είναι απλώς (M/2)*||w||*w.
+    """
+    return (g + H @ w) / scale \
+           + (M/2) * w * np.linalg.norm(w)
+
+def cubic_gradient(w, H, g, M):
+    """
+    ∇m(w) = g + H w + (M/2) * ||w|| * w    σαν την εργασία του Πατρινού
+    """
+    linquad = g + H @ w
+    normw   = np.linalg.norm(w)
+    cubic   = 0.5 * M * normw * w
+    return linquad + cubic
