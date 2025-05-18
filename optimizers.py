@@ -572,6 +572,65 @@ class AdaptiveGDK1onKNesterov(Trainer):
 
         return w_new
 
+
+class AdaPGNesterov(Trainer):
+    """
+    Adaptive GD with τ₁=(k+1)/k * lr_prev and τ₂=0.5*||Δx||/||Δg||,
+    plus Nesterov‐type momentum.
+    """
+    def __init__(self, lr0=None, *args, **kwargs):
+        super(AdaPGNesterov, self).__init__(*args, **kwargs)
+        self.lr0 = lr0
+
+    def init_run(self, w0):
+        # Θεμέλιο init
+        super(AdaPGNesterov, self).init_run(w0)
+
+        # Αρχικό βήμα
+        if self.lr0 is None:
+            self.lr0 = 1e-10
+        self.lr = self.lr0
+
+        # Main variable
+
+        # Nesterov momentum variable
+        self.y = self.w.copy()
+        self.y_old = self.w.copy()
+
+        # Υπολογισμός αρχικής κλίσης
+        grad = self.grad_func(self.w)
+        self.grad = grad
+
+        # Αρχικές τιμές για curvature
+        self.w_old    = self.w.copy()
+        self.grad_old = grad
+
+        # Πρώτο GD βήμα
+        self.w -= self.lr * grad
+        self.save_checkpoint()
+
+    def step(self):
+        # Compute new extrapolation point and store the previous one
+        self.y_old = self.y.copy()
+        self.y = self.w + self.it / (self.it + 3) * (self.w - self.w_old)
+        # Compute gradient at extrapolated point and store the previous one
+        self.grad_old = self.grad.copy()
+        self.grad = self.grad_func(self.y)
+
+        # Compute stepsize
+        k = max(1, self.it)
+        # tau1 = (k + 1) / k * self.lr
+        tau1 = (k+1)/k * self.lr
+        denom = la.norm(self.y - self.y_old) + 1e-12
+        Lloc = la.norm(self.grad - self.grad_old) / denom
+        tau2 = 0.5 / Lloc
+        self.lr = min(tau1, tau2)
+
+        # Perform gradient step
+        self.w_old = self.w.copy()
+        self.w = self.y - self.lr * self.grad
+        return self.w
+
 class AdgdHybrid(Trainer):
     """
     Hybrid adaptive gradient descent:
