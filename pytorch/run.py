@@ -6,8 +6,8 @@ import time
 # from optimizer import Adsgd   την εχω βαλει σε comment
 # from optimizer_adgrad import AdsgdAdGrad
 # from optimizer_adgrad_nesterov import AdsgdAdGradNesterov
-from optimizer_adaptive_npgm import AdsgdAdaptiveNPGM
-# from optimizer_adaptive_npgm2 import AdsgdAdaptiveNPGM
+# from optimizer_adaptive_npgm import AdsgdAdaptiveNPGM
+from optimizer_adaptive_npgm2 import AdsgdAdaptiveNPGM
 
 
 

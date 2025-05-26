@@ -46,7 +46,19 @@ class AdsgdAdaptiveNPGM(Optimizer):
                 if p.grad is None:
                     continue
 
+                # 1) Βασικό gradient
                 grad = p.grad.data
+
+                # 2) Προσθέτουμε weight decay
+                if weight_decay != 0:
+                    grad = grad.add(p.data, alpha=weight_decay)
+
+                # 3) Υπολογίζουμε scaling & scaled_grad με το decayed grad
+                norm_g = grad.norm().item()
+                scaling = np.arcsinh(norm_g) / norm_g if norm_g > 0 else 0.0
+                scaled_grad = scaling * grad
+
+                # Τώρα παίρνουμε το state για αυτό το p
                 state = self.state[p]
 
                 # Initialization
@@ -64,9 +76,7 @@ class AdsgdAdaptiveNPGM(Optimizer):
                     state['norm_grad_old'] = norm_g
                     state['x_old'] = p.data.clone()
 
-                    # Weight decay outside grad graph
-                    if weight_decay != 0:
-                        grad = grad.add(p.data, alpha=weight_decay)
+
                     # Parameter update without tracking in autograd
                     with torch.no_grad():
                         p.data.add_(scaled_grad, alpha=-gamma)
@@ -94,9 +104,7 @@ class AdsgdAdaptiveNPGM(Optimizer):
                 tau = gamma * (scaling_old / scaling) * (norm_g / norm_grad_old) * (1 + gamma / gamma_prev)
                 gamma_new = min(tau, 1.0 / (2 * Lk))
 
-                # Effective gradient for weight decay
-                if weight_decay != 0:
-                    grad = grad.add(p.data, alpha=weight_decay)
+
 
                 # Parameter update with no_grad
                 with torch.no_grad():
