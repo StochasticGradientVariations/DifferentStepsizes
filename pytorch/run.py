@@ -6,8 +6,8 @@ import time
 # from optimizer import Adsgd   την εχω βαλει σε comment
 # from optimizer_adgrad import AdsgdAdGrad
 # from optimizer_adgrad_nesterov import AdsgdAdGradNesterov
-# from optimizer_adaptive_npgm import AdsgdAdaptiveNPGM
-from optimizer_adaptive_npgm2 import AdsgdAdaptiveNPGM
+from optimizer_adaptive_npgm import AdaptiveNPGM
+# from optimizer_adaptive_npgm2 import AdaptiveNPGM
 
 
 
@@ -46,7 +46,9 @@ def run_adgd(net, n_epoch=2, amplifier=0.02, damping=1, weight_decay=0, eps=1e-8
     #     weight_decay=weight_decay,
     #     tau_rule='original'   #(για το  k/(k+3) βαζω tau_rule='mod')
     # )
-    initial_lr = 1e-2
+    # initial_lr = 1e-2
+    initial_lr = 1e-1  # ή 0.05
+
     # optimizer = AdsgdAdGradNesterov(net.parameters(),
     #                                 lr=initial_lr,
     #                                 weight_decay=weight_decay,
@@ -55,8 +57,8 @@ def run_adgd(net, n_epoch=2, amplifier=0.02, damping=1, weight_decay=0, eps=1e-8
     #                                      lr=initial_lr,
     #                                      weight_decay=weight_decay,
     #                                      tau_rule='original')
-    optimizer = AdsgdAdaptiveNPGM(net.parameters(), lr=initial_lr, weight_decay=weight_decay)
-    prev_optimizer = AdsgdAdaptiveNPGM(prev_net.parameters(), lr=initial_lr, weight_decay=weight_decay)
+    optimizer = AdaptiveNPGM(net.parameters(), lr=initial_lr, weight_decay=weight_decay)
+    prev_optimizer = AdaptiveNPGM(prev_net.parameters(), lr=initial_lr, weight_decay=weight_decay)
 
     for epoch in range(n_epoch):  # loop over the dataset multiple times
 
@@ -82,7 +84,7 @@ def run_adgd(net, n_epoch=2, amplifier=0.02, damping=1, weight_decay=0, eps=1e-8
             # ——————— Εδώ προσθέτουμε την εκτύπωση ———————
             if i % 10 == 0:
                 lr = optimizer.param_groups[0]['lr']
-                print(f"[Epoch {epoch:2d} | Step {i:4d}] loss = {loss.item():.4f}, lr = {lr:.5f}")
+                print(f"[Epoch {epoch:2d} | Step {i:4d}] loss = {loss.item():.4f}, lr = {lr:.2e}")
             # ————————————————————————————————————————
 
 

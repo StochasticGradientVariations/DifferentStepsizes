@@ -1,108 +1,121 @@
 import torch
 import numpy as np
-from torch.optim.optimizer import Optimizer, required
+from torch.optim.optimizer import Optimizer
 
-class AdsgdAdaptiveNPGM(Optimizer):
-    """
-    Adaptive SGD optimizer implementing the Adaptive NPGM logic from Algorithm 1.
-    Scaling factor sₖ = arsinh(||gₖ||)/||gₖ||, adaptive rule for gammaₖ₊₁.
-    """
-    def __init__(self, params, lr=1e-2, weight_decay=0):
+
+class AdaptiveNPGM(Optimizer):
+    def __init__(self, params, lr=1e-2, weight_decay=0, epsilon=1e-12):
         if lr < 0.0:
             raise ValueError(f"Invalid initial learning rate: {lr}")
         if weight_decay < 0.0:
             raise ValueError(f"Invalid weight_decay value: {weight_decay}")
 
-        defaults = dict(lr=lr, weight_decay=weight_decay)
-        super(AdsgdAdaptiveNPGM, self).__init__(params, defaults)
-
-    def __setstate__(self, state):
-        super(AdsgdAdaptiveNPGM, self).__setstate__(state)
-        for group in self.param_groups:
-            group.setdefault('lr', 1e-2)
-            group.setdefault('weight_decay', 0)
+        defaults = dict(lr=lr, weight_decay=weight_decay, epsilon=epsilon)
+        super().__init__(params, defaults)
 
     def compute_dif_norms(self, prev_optimizer):
-        for group, prev_group in zip(self.param_groups, prev_optimizer.param_groups):
-            grad_diff_sq = 0.0
-            param_diff_sq = 0.0
-            for p, prev_p in zip(group['params'], prev_group['params']):
-                if p.grad is None or prev_p.grad is None:
-                    continue
-                grad_diff_sq += (p.grad.data - prev_p.grad.data).norm().item()**2
-                param_diff_sq += (p.data - prev_p.data).norm().item()**2
-            group['grad_diff_norm'] = np.sqrt(grad_diff_sq)
-            group['param_diff_norm'] = np.sqrt(param_diff_sq)
+        # Η μέθοδος υπάρχει για συμβατότητα, αλλά δεν χρησιμοποιείται πλέον.
+        pass
 
     def step(self, closure=None):
-        loss = None
-        if closure is not None:
-            loss = closure()
+        loss = closure() if closure else None
 
         for group in self.param_groups:
             weight_decay = group['weight_decay']
+            epsilon = group['epsilon']
 
+            params_with_grad = []
+            grads = []
             for p in group['params']:
                 if p.grad is None:
                     continue
-
                 grad = p.grad.data
-                state = self.state[p]
-
-                # Initialization
-                if len(state) == 0:
-                    gamma = group['lr']
-                    norm_g = grad.norm().item()
-                    scaling = np.arcsinh(norm_g) / norm_g if norm_g > 0 else 0.0
-                    scaled_grad = scaling * grad
-
-                    state['step'] = 0
-                    state['gamma'] = gamma
-                    state['gamma_prev'] = gamma
-                    state['scaling_old'] = scaling
-                    state['scaled_grad_old'] = scaled_grad.clone()
-                    state['norm_grad_old'] = norm_g
-                    state['x_old'] = p.data.clone()
-
-                    if weight_decay != 0:
-                        grad.add_(weight_decay, p.data)
-                    p.data.add_(scaled_grad, alpha=-gamma)
-                    continue
-
-                # Step info
-                gamma = state['gamma']
-                gamma_prev = state['gamma_prev']
-                scaling_old = state['scaling_old']
-                scaled_grad_old = state['scaled_grad_old']
-                norm_grad_old = state['norm_grad_old']
-                x_old = state['x_old']
-
-                # Compute new scaled gradient
-                norm_g = grad.norm().item()
-                scaling = np.arcsinh(norm_g) / norm_g if norm_g > 0 else 0.0
-                scaled_grad = scaling * grad
-
-                # Estimate curvature
-                delta_g = scaled_grad - scaled_grad_old
-                delta_x = p.data - x_old
-                Lk = delta_g.norm().item() / (delta_x.norm().item() + 1e-12)
-
-                # Adaptive rule for gamma
-                tau = gamma * (scaling_old / scaling) * (norm_g / norm_grad_old) * (1 + gamma / gamma_prev)
-                gamma_new = min(tau, 1.0 / (2 * Lk))
-
-                # Apply update
                 if weight_decay != 0:
-                    grad.add_(weight_decay, p.data)
-                p.data.add_(scaled_grad, alpha=-gamma_new)
+                    grad = grad.add(p.data, alpha=weight_decay)
 
-                # Update state
-                state['step'] += 1
-                state['gamma_prev'] = gamma
-                state['gamma'] = gamma_new
-                state['scaling_old'] = scaling
-                state['scaled_grad_old'] = scaled_grad.clone()
-                state['norm_grad_old'] = norm_g
-                state['x_old'] = p.data.clone()
+                params_with_grad.append(p)
+                grads.append(grad.view(-1))
+
+            if not grads:
+                continue
+
+            g_k = torch.cat(grads)
+            norm_g = g_k.norm()
+            s_k = torch.asinh(norm_g) / (norm_g + epsilon)
+            scaled_g = s_k * g_k
+
+            state = self.state.setdefault('global_state', {})
+
+            if len(state) == 0:
+                gamma = group['lr']
+                state.update({
+                    'gamma': gamma,
+                    'gamma_prev': gamma,
+                    'scaled_g_old': scaled_g.clone(),
+                    's_old': s_k,
+                    'norm_g_old': norm_g.item(),
+                    'x_old': torch.cat([p.data.view(-1) for p in params_with_grad]).clone(),
+                    'norm_g_hist': [norm_g.item()]  # ✅ Προσθέτεις αυτό
+                })
+
+                with torch.no_grad():
+                    idx = 0
+                    for p in params_with_grad:
+                        numel = p.numel()
+                        grad_segment = scaled_g[idx:idx + numel].view_as(p)
+                        p.data.add_(grad_segment, alpha=-gamma)
+                        idx += numel
+                continue
+
+            gamma_k = state['gamma']
+            gamma_km1 = state['gamma_prev']
+            s_old = state['s_old']
+            scaled_g_old = state['scaled_g_old']
+            norm_g_old = state['norm_g_old']
+            x_old = state['x_old']
+
+            x_k = torch.cat([p.data.view(-1) for p in params_with_grad])
+
+            delta_g = scaled_g - scaled_g_old
+            delta_x = x_k - x_old
+            L_k = delta_g.norm() / (delta_x.norm() + epsilon)
+
+            # Διορθωμένος υπολογισμός arsinh_ratio
+            # ✅ Ενημερώνουμε ιστορικό με την τρέχουσα norm_g
+            hist = state.get('norm_g_hist', [])
+            hist.append(norm_g.item())
+            if len(hist) > 4:
+                hist.pop(0)
+            state['norm_g_hist'] = hist
+
+            # ✅ Υπολογισμός arsinh_ratio με βάση το ιστορικό
+            if len(hist) == 4:
+                num = torch.asinh(torch.tensor(hist[1])) * torch.asinh(torch.tensor(hist[3]))
+                denom = torch.asinh(torch.tensor(hist[0])) * torch.asinh(torch.tensor(hist[2]))
+                arsinh_ratio = (num / (denom + epsilon)).item()
+            else:
+                arsinh_ratio = (torch.asinh(norm_g) / torch.asinh(torch.tensor(norm_g_old))).item()
+            tau = gamma_k * arsinh_ratio
+            gamma_min = 1e-6
+            gamma_new = max(min(tau, 1.0 / (2 * L_k)), gamma_min)
+
+            with torch.no_grad():
+                idx = 0
+                for p in params_with_grad:
+                    numel = p.numel()
+                    grad_segment = scaled_g[idx:idx + numel].view_as(p)
+                    p.data.add_(grad_segment, alpha=-gamma_new)
+                    idx += numel
+
+            state.update({
+                'gamma_prev': gamma_k,
+                'gamma': gamma_new,
+                'scaled_g_old': scaled_g.clone(),
+                's_old': s_k,
+                'norm_g_old': norm_g.item(),
+                'x_old': x_k.clone(),
+            })
+
+            group['lr'] = gamma_new
 
         return loss
