@@ -1111,3 +1111,71 @@ class ADPG_Momentum4(Trainer):
         self.w = x_new
         self.save_checkpoint()
         return x_new
+
+class AdaptiveNPGM(Trainer):
+    """
+    Algorithm 1: Adaptive NPGM (Adaptive Natural Polyak Gradient Method).
+    See eqs. (11)–(13) in the paper.
+    """
+    def __init__(self, gamma0, gamma_prev=None, *args, **kwargs):
+        super(AdaptiveNPGM, self).__init__(*args, **kwargs)
+        if gamma0 <= 0:
+            raise ValueError("gamma0 must be positive")
+        self.gamma0 = gamma0
+        # if no previous step size given, start with same as gamma0
+        self.gamma_prev0 = gamma_prev if gamma_prev is not None else gamma0
+
+    def init_run(self, w0):
+        super(AdaptiveNPGM, self).init_run(w0)
+        # initialize step sizes
+        self.gamma_prev = self.gamma_prev0
+        self.gamma = self.gamma0
+        # compute ∇f(x⁰) and its scaling s₀ = arsinh(‖g‖)/‖g‖
+        g0 = self.grad_func(self.w)
+        self.grad = g0
+        n0 = la.norm(g0)
+        self.scaling_old = np.arcsinh(n0)/n0 if n0>0 else 0.0
+        self.scaled_grad_old = self.scaling_old * g0
+        self.norm_grad_old = n0
+        # store x⁰
+        self.w_old = self.w.copy()
+        # first update x¹ = x⁰ − γ₀ * s₀ g₀
+        self.w = self.w - self.gamma * self.scaled_grad_old
+        self.save_checkpoint()
+
+    def estimate_stepsize(self):
+        # here self.w is xᵏ and self.grad was set by compute_grad()
+        gk = self.grad
+        nk = la.norm(gk)
+        sk = np.arcsinh(nk)/nk if nk>0 else 0.0
+        scaled_gk = sk * gk
+
+        # curvature estimate Lₖ = ‖sₖgₖ − sₖ₋₁gₖ₋₁‖ / ‖xᵏ − xᵏ₋₁‖
+        Δg = scaled_gk - self.scaled_grad_old
+        Δx = self.w - self.w_old
+        Lk = la.norm(Δg) / la.norm(Δx)
+
+        # adaptive rule (eq. 12): τ = γₖ · (sₖ₋₁/sₖ) · (nₖ/nₖ₋₁) · (1 + γₖ/γₖ₋₁)
+        tau = self.gamma * (self.scaling_old/sk) * (nk/self.norm_grad_old) * (1 + self.gamma/self.gamma_prev)
+        γ_new = min(tau, 1.0/(2*Lk))
+
+        # shift gammas
+        self.gamma_prev = self.gamma
+        self.gamma = γ_new
+
+        # stash for the next curvature computation
+        self.scaled_grad_current = scaled_gk
+        self.norm_grad_current = nk
+        self.scaling_current = sk
+
+    def step(self):
+        # perform update xᵏ⁺¹ = xᵏ − γₖ₊₁ · sₖ gₖ
+        x_new = self.w - self.gamma * self.scaled_grad_current
+
+        # move “old” markers forward
+        self.w_old = self.w.copy()
+        self.scaled_grad_old = self.scaled_grad_current.copy()
+        self.norm_grad_old = self.norm_grad_current
+        self.scaling_old = self.scaling_current
+
+        return x_new
