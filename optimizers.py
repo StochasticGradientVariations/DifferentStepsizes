@@ -1114,7 +1114,7 @@ class ADPG_Momentum4(Trainer):
 
 class AdaptiveNPGM(Trainer):
     """
-    Algorithm 1: Adaptive NPGM (Adaptive Natural Polyak Gradient Method).
+    Algorithm 1: Adaptive NPGM .
     See eqs. (11)–(13) in the paper.
     """
     def __init__(self, gamma0, gamma_prev=None, *args, **kwargs):
@@ -1156,12 +1156,16 @@ class AdaptiveNPGM(Trainer):
         Lk = la.norm(Δg) / la.norm(Δx)
 
         # adaptive rule (eq. 12): τ = γₖ · (sₖ₋₁/sₖ) · (nₖ/nₖ₋₁) · (1 + γₖ/γₖ₋₁)
-        tau = self.gamma * (self.scaling_old/sk) * (nk/self.norm_grad_old) * (1 + self.gamma/self.gamma_prev)
-        γ_new = min(tau, 1.0/(2*Lk))
+        tau = self.gamma * np.sqrt(
+            (self.scaling_old / sk)  # sₖ₋₁/sₖ
+            * (nk / self.norm_grad_old)  # nₖ/nₖ₋₁
+            * (1 + self.gamma / self.gamma_prev)  # (1 + γₖ/γₖ₋₁)
+        )
+        gamma_new = min(tau, 1.0 / (2 * Lk))
 
         # shift gammas
         self.gamma_prev = self.gamma
-        self.gamma = γ_new
+        self.gamma = gamma_new
 
         # stash for the next curvature computation
         self.scaled_grad_current = scaled_gk

@@ -1,121 +1,103 @@
 import torch
-import numpy as np
 from torch.optim.optimizer import Optimizer
 
-
 class AdaptiveNPGM(Optimizer):
-    def __init__(self, params, lr=1e-2, weight_decay=0, epsilon=1e-12):
-        if lr < 0.0:
-            raise ValueError(f"Invalid initial learning rate: {lr}")
-        if weight_decay < 0.0:
-            raise ValueError(f"Invalid weight_decay value: {weight_decay}")
-
+    """
+    Fully faithful implementation of Algorithm 1: Adaptive NPGM
+    """
+    def __init__(self, params, lr=1e-2, weight_decay=0.0, epsilon=1e-12):
+        if lr <= 0:
+            raise ValueError("lr must be positive")
         defaults = dict(lr=lr, weight_decay=weight_decay, epsilon=epsilon)
         super().__init__(params, defaults)
 
-    def compute_dif_norms(self, prev_optimizer):
-        # Η μέθοδος υπάρχει για συμβατότητα, αλλά δεν χρησιμοποιείται πλέον.
-        pass
-
     def step(self, closure=None):
-        loss = closure() if closure else None
+        if closure is None:
+            raise RuntimeError("Closure must be provided to evaluate f(x)")
+        loss = closure()
 
         for group in self.param_groups:
-            weight_decay = group['weight_decay']
-            epsilon = group['epsilon']
+            wd  = group['weight_decay']
+            eps = group['epsilon']
 
-            params_with_grad = []
-            grads = []
+            # Gather parameters and gradients
+            params, grads = [], []
             for p in group['params']:
                 if p.grad is None:
                     continue
-                grad = p.grad.data
-                if weight_decay != 0:
-                    grad = grad.add(p.data, alpha=weight_decay)
-
-                params_with_grad.append(p)
-                grads.append(grad.view(-1))
-
+                g = p.grad.data
+                if wd != 0:
+                    g = g.add(p.data, alpha=wd)
+                params.append(p)
+                grads.append(g.view(-1))
             if not grads:
                 continue
 
             g_k = torch.cat(grads)
             norm_g = g_k.norm()
-            s_k = torch.asinh(norm_g) / (norm_g + epsilon)
-            scaled_g = s_k * g_k
+            s_k = torch.asinh(norm_g) / norm_g
+            scaled_gk = s_k * g_k
+            x_k = torch.cat([p.data.view(-1) for p in params])
 
-            state = self.state.setdefault('global_state', {})
-
-            if len(state) == 0:
-                gamma = group['lr']
+            # Access or initialize state
+            state = self.state.setdefault('state', {})
+            if 'gamma' not in state:
+                gamma0 = group['lr']
                 state.update({
-                    'gamma': gamma,
-                    'gamma_prev': gamma,
-                    'scaled_g_old': scaled_g.clone(),
+                    'gamma': gamma0,
+                    'gamma_prev': gamma0,
                     's_old': s_k,
-                    'norm_g_old': norm_g.item(),
-                    'x_old': torch.cat([p.data.view(-1) for p in params_with_grad]).clone(),
-                    'norm_g_hist': [norm_g.item()]  # ✅ Προσθέτεις αυτό
+                    'norm_old': norm_g.clone(),
+                    'scaled_g_old': scaled_gk.clone(),
+                    'x_old': x_k.clone()
                 })
 
+                # First update: x¹ = x⁰ − γ₀ * scaled_g₀
                 with torch.no_grad():
-                    idx = 0
-                    for p in params_with_grad:
+                    offset = 0
+                    for p in params:
                         numel = p.numel()
-                        grad_segment = scaled_g[idx:idx + numel].view_as(p)
-                        p.data.add_(grad_segment, alpha=-gamma)
-                        idx += numel
+                        seg = scaled_gk[offset:offset + numel].view_as(p)
+                        p.data.add_(seg, alpha=-gamma0)
+                        offset += numel
                 continue
 
-            gamma_k = state['gamma']
+            # Eq. (11): L_k = ‖ŷₖ − ŷₖ₋₁‖ / ‖xₖ − xₖ₋₁‖
+            delta_y = scaled_gk - state['scaled_g_old']
+            delta_x = x_k - state['x_old']
+            Lk = delta_y.norm() / (delta_x.norm() + eps)
+
+            # Eq. (12): τ = γₖ · sqrt( (sₖ₋₁ / sₖ) · (nₖ / nₖ₋₁) · (1 + γₖ / γₖ₋₁) )
+            gamma_k   = state['gamma']
             gamma_km1 = state['gamma_prev']
-            s_old = state['s_old']
-            scaled_g_old = state['scaled_g_old']
-            norm_g_old = state['norm_g_old']
-            x_old = state['x_old']
+            norm_old  = state['norm_old']
+            s_old     = state['s_old']
 
-            x_k = torch.cat([p.data.view(-1) for p in params_with_grad])
+            tau = gamma_k * torch.sqrt(
+                (s_old / s_k)
+              * (norm_g / norm_old)
+              * (1 + gamma_k / gamma_km1)
+            )
 
-            delta_g = scaled_g - scaled_g_old
-            delta_x = x_k - x_old
-            L_k = delta_g.norm() / (delta_x.norm() + epsilon)
+            # γₖ₊₁ = min(τ, 1 / (2·Lₖ))
+            gamma_new = min(tau.item(), 1.0 / (2 * Lk.item()))
 
-            # Διορθωμένος υπολογισμός arsinh_ratio
-            # ✅ Ενημερώνουμε ιστορικό με την τρέχουσα norm_g
-            hist = state.get('norm_g_hist', [])
-            hist.append(norm_g.item())
-            if len(hist) > 4:
-                hist.pop(0)
-            state['norm_g_hist'] = hist
-
-            # ✅ Υπολογισμός arsinh_ratio με βάση το ιστορικό
-            if len(hist) == 4:
-                num = torch.asinh(torch.tensor(hist[1])) * torch.asinh(torch.tensor(hist[3]))
-                denom = torch.asinh(torch.tensor(hist[0])) * torch.asinh(torch.tensor(hist[2]))
-                arsinh_ratio = (num / (denom + epsilon)).item()
-            else:
-                arsinh_ratio = (torch.asinh(norm_g) / torch.asinh(torch.tensor(norm_g_old))).item()
-            tau = gamma_k * arsinh_ratio
-            gamma_min = 1e-6
-            gamma_new = max(min(tau, 1.0 / (2 * L_k)), gamma_min)
-
+            # Eq. (13): xᵏ⁺¹ = xᵏ − γₖ₊₁·ŷₖ
             with torch.no_grad():
-                idx = 0
-                for p in params_with_grad:
+                offset = 0
+                for p in params:
                     numel = p.numel()
-                    grad_segment = scaled_g[idx:idx + numel].view_as(p)
-                    p.data.add_(grad_segment, alpha=-gamma_new)
-                    idx += numel
+                    seg = scaled_gk[offset:offset + numel].view_as(p)
+                    p.data.add_(seg, alpha=-gamma_new)
+                    offset += numel
 
-            state.update({
-                'gamma_prev': gamma_k,
-                'gamma': gamma_new,
-                'scaled_g_old': scaled_g.clone(),
-                's_old': s_k,
-                'norm_g_old': norm_g.item(),
-                'x_old': x_k.clone(),
-            })
-
+            # Shift state for next iteration
+            state['x_old'] = x_k.clone()
+            state['scaled_g_old'] = scaled_gk.clone()
+            state['s_old'] = s_k
+            state['norm_old'] = norm_g.clone()
+            state['gamma_prev'] = gamma_k
+            state['gamma'] = gamma_new
             group['lr'] = gamma_new
 
         return loss
