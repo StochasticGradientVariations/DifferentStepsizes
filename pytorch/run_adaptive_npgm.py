@@ -38,20 +38,24 @@ def run_adaptive_npgm(
         running_loss = 0.0
         for i, (inputs, labels) in enumerate(trainloader):
             start_time = time.time()
-
             inputs, labels = inputs.to(device), labels.to(device)
 
-            optimizer.zero_grad(set_to_none=True)
+            # Ορίζουμε σωστά το closure
+            # Ορίζουμε σωστά το closure
+            def closure():
+                optimizer.zero_grad(set_to_none=True)
+                outputs = net(inputs)
+                loss = criterion(outputs, labels)
+                loss.backward()
+                return loss
 
-            outputs = net(inputs)
-            loss = criterion(outputs, labels)
-            loss.backward()
+            # Forward + backward + adaptive update σε μία κλήση
+            loss = optimizer.step(closure)
 
+            # Logging (μία φορά)
             if i % 10 == 0:
                 lr = optimizer.param_groups[0]['lr']
                 print(f"[Epoch {epoch:2d} | Step {i:4d}] loss = {loss.item():.4f}, lr = {lr:.2e}")
-
-            optimizer.step(lambda: loss)
 
             elapsed = time.time() - start_time
             print(f"Minibatch {i:4d} took {elapsed:.4f}s")
