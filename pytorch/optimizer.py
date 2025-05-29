@@ -3,12 +3,13 @@ import numpy as np
 
 from torch.optim.optimizer import Optimizer, required
 
-    
+
 class Adsgd(Optimizer):
     r"""
     Adaptive SGD with estimation of the local smoothness (curvature).
     Based on https://arxiv.org/abs/1910.09529
     """
+
     def __init__(self, params, lr=0.2, amplifier=0.02, theta=1, damping=1, eps=1e-5, weight_decay=0):
         if lr is not required and lr < 0.0:
             raise ValueError("Invalid initial learning rate: {}".format(lr))
@@ -26,7 +27,7 @@ class Adsgd(Optimizer):
             group.setdefault('amplifier', 0.02)
             group.setdefault('damping', 1)
             group.setdefault('theta', 1)
-                
+
     def compute_dif_norms(self, prev_optimizer=required):
         for group, prev_group in zip(self.param_groups, prev_optimizer.param_groups):
             grad_dif_norm = 0
@@ -48,7 +49,7 @@ class Adsgd(Optimizer):
             closure (callable, optional): A closure that reevaluates the model
                 and returns the loss.
         """
-        
+
         # TODO: use closure to compute gradient difference
         loss = None
         if closure is not None:
