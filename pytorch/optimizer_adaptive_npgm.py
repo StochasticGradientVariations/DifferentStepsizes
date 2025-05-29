@@ -40,7 +40,9 @@ class AdaptiveNPGM(Optimizer):
             x_k = torch.cat([p.data.view(-1) for p in params])
 
             # Access or initialize state
-            state = self.state.setdefault('state', {})
+            # νέα γραμμή — ξεχωριστό dict για κάθε group
+            state = group.setdefault('state', {})
+
             if 'gamma' not in state:
                 gamma0 = group['lr']
                 state.update({
