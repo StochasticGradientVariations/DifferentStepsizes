@@ -40,16 +40,17 @@ def run_adaptive_npgm(
             start_time = time.time()
             inputs, labels = inputs.to(device), labels.to(device)
 
-            # Ορίζουμε σωστά το closure
-            # Ορίζουμε σωστά το closure
+            # reset gradients
+            optimizer.zero_grad(set_to_none=True)
+
+            # closure: μόνο forward+backward
             def closure():
-                optimizer.zero_grad(set_to_none=True)
                 outputs = net(inputs)
                 loss = criterion(outputs, labels)
                 loss.backward()
                 return loss
 
-            # Forward + backward + adaptive update σε μία κλήση
+            # ένα call: forward, backward & adaptive update
             loss = optimizer.step(closure)
 
             # Logging (μία φορά)
