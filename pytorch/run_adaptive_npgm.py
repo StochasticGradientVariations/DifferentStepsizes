@@ -29,7 +29,13 @@ def run_adaptive_npgm(
 
     criterion = torch.nn.CrossEntropyLoss()
     initial_lr = 1e-1
-    optimizer = AdaptiveNPGM(net.parameters(), lr=initial_lr, weight_decay=weight_decay)
+    # optimizer = AdaptiveNPGM(net.parameters(), lr=initial_lr, weight_decay=weight_decay)
+    optimizer = AdaptiveNPGM(
+        net.parameters(),
+        lr=initial_lr,
+        weight_decay=weight_decay,
+        r_k=2  # ← εδώ βαζουμε το damping factor που θελουμε
+    )
 
     if checkpoint is None:
         checkpoint = len(trainloader) // 3

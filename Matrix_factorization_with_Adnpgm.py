@@ -19,8 +19,9 @@ from optimizers import (
     AdgdK1OverK,
     AdaptiveGDK1onKNesterov,
     ADPG_Momentum,
-    AdaptiveNPGM    # <--- προσθήκη της νέας μεθόδου
+    AdaptiveNPGM
 )
+
 
 def load_data(path="datasets/u.data"):
     names = ['user_id','item_id','rating','timestamp']
@@ -59,9 +60,13 @@ def main():
     r = 20
     df_func, m, n = make_problem(A, r)
 
-    # Αρχικοποίηση
+    # # Αρχικοποίηση
+    # np.random.seed(0)
+    # X0 = np.random.randn(m+n, r)
+    # Αρχικοποίηση με πολύ μικρή τυχαία κλίμακα
     np.random.seed(0)
-    X0 = np.random.randn(m+n, r)
+    sigma = 1e-5          # ή 1e-6
+    X0 = sigma * np.random.randn(m+n, r)
 
     # Params
     N     = 5000    # λιγότερες επαναλήψεις
@@ -103,7 +108,7 @@ def main():
                                           gamma_prev=1.0/L_gd,
                                           loss_func=loss_grad,
                                           grad_func=grad_func,
-                                          it_max=N)),
+                                          it_max=N))
     ]
 
     opts, labels = [], []

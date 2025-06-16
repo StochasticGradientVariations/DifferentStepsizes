@@ -1,4 +1,4 @@
-* About
+σ* About
 This is the supplementary code (in Python 3) for the paper Y. Malitsky and K. Mishchenko "Adaptive Gradient Descent without Descent"
 (two-column [[https://proceedings.icml.cc/static/paper_files/icml/2020/2854-Paper.pdf][ICML]] or one-column [[https://arxiv.org/pdf/1910.09529.pdf][arxiv]])
 

@@ -14,7 +14,7 @@ from optimizers import (
     Gd, Nesterov, Adgd, AdgdAccel,
     AdgdK1OverK, AdgdKOverKplus3, AdaptiveGDK1onKNesterov,
     AdgdHybrid, AdgdHybrid2,
-    ADPG_Momentum, ADPG_Momentum2, ADPG_Momentum3
+    ADPG_Momentum, ADPG_Momentum2, ADPG_Momentum3, AdaptiveNPGM
 )
 
 def load_movielens_u_data(path):
@@ -68,21 +68,24 @@ def main():
         Gd, Nesterov, Adgd,
         AdgdK1OverK, AdaptiveGDK1onKNesterov,
         AdgdHybrid, AdgdHybrid2,
-        ADPG_Momentum, ADPG_Momentum2, ADPG_Momentum3
+        ADPG_Momentum, ADPG_Momentum2, ADPG_Momentum3,    AdaptiveNPGM
+
     ]
     LABELS = [
         'GD','Nesterov','AdGD',
         'AdGD (k+1)/k','AdGD+Nesterov',
         'AdGD Hybrid v1','AdGD Hybrid v2',
-        'ADPG_M1','ADPG_M2','ADPG_M3'
+        'ADPG_M1','ADPG_M2','ADPG_M3' ,'AdaptiveNPGM'
     ]
-    MARKERS = [',','o','*','<','x','d','D','h','p','H']
+    MARKERS = [',','o','*','<','x','d','D','h','p','H', 's']
 
     optimizers = []
     for Opt in OPTS:
         kwargs = dict(loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
         sig = Opt.__init__.__code__.co_varnames
-        if 'lr' in sig:
+        if Opt.__name__ == 'AdaptiveNPGM':
+            kwargs['gamma0'] = 1.0 / L
+        elif 'lr' in sig:
             kwargs['lr'] = 1.0 / L
         elif 'lr0' in sig:
             kwargs['lr0'] = 1.0 / L

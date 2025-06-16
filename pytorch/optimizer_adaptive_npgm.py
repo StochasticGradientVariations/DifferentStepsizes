@@ -5,10 +5,17 @@ class AdaptiveNPGM(Optimizer):
     """
     Fully faithful implementation of Algorithm 1: Adaptive NPGM
     """
-    def __init__(self, params, lr=1e-2, weight_decay=0.0, epsilon=1e-12):
+    def __init__(self, params, lr=1e-2, weight_decay=0.0, epsilon=1e-12, r_k=0.0):
         if lr <= 0:
             raise ValueError("lr must be positive")
-        defaults = dict(lr=lr, weight_decay=weight_decay, epsilon=epsilon)
+        # defaults = dict(lr=lr, weight_decay=weight_decay, epsilon=epsilon)
+        defaults = dict(
+            lr=lr,
+            weight_decay=weight_decay,
+            epsilon=epsilon,
+            # r_k=0.0  # ← εδώ ορίζουμε το damping factor (default = 0)
+            r_k=r_k  # ← δέχεται τώρα την τιμή που περνάμε απέξω
+        )
         super().__init__(params, defaults)
 
     def step(self, closure=None):
@@ -69,20 +76,40 @@ class AdaptiveNPGM(Optimizer):
             delta_x = x_k - state['x_old']
             Lk = delta_y.norm() / (delta_x.norm() + eps)
 
+            # # Eq. (12): τ = γₖ · sqrt( (sₖ₋₁ / sₖ) · (nₖ / nₖ₋₁) · (1 + γₖ / γₖ₋₁) )
+            # gamma_k   = state['gamma']
+            # gamma_km1 = state['gamma_prev']
+            # norm_old  = state['norm_old']
+            # s_old     = state['s_old']
+            #
+            # tau = gamma_k * torch.sqrt(
+            #     (s_old / s_k)
+            #   * (norm_g / norm_old)
+            #   * (1 + gamma_k / gamma_km1)
+            # )
             # Eq. (12): τ = γₖ · sqrt( (sₖ₋₁ / sₖ) · (nₖ / nₖ₋₁) · (1 + γₖ / γₖ₋₁) )
-            gamma_k   = state['gamma']
+            gamma_k = state['gamma']
             gamma_km1 = state['gamma_prev']
-            norm_old  = state['norm_old']
-            s_old     = state['s_old']
+            norm_old = state['norm_old']
+            s_old = state['s_old']
 
+            # διάβασε το damping factor
+            r_k = group['r_k']
+
+            # προσθέτουμε εδώ το (1 + r_k)
             tau = gamma_k * torch.sqrt(
                 (s_old / s_k)
               * (norm_g / norm_old)
               * (1 + gamma_k / gamma_km1)
             )
-
             # γₖ₊₁ = min(τ, 1 / (2·Lₖ))
-            gamma_new = min(tau.item(), 1.0 / (2 * Lk.item()))
+            # gamma_new = min(tau.item(), 1.0 / (2 * Lk.item()))
+            gamma_new = min(
+                tau.item(),
+                (1.0 + r_k) / (2 * Lk.item())
+            )
+
+            print(f"[dbg] L_k = {Lk.item():.2e}, τ = {tau.item():.2e}, γ_new = {gamma_new:.2e}")
 
             # Eq. (13): xᵏ⁺¹ = xᵏ − γₖ₊₁·ŷₖ
             with torch.no_grad():
