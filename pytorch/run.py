@@ -5,8 +5,8 @@ import time
 
 # from optimizer import Adsgd   την εχω βαλει σε comment
 # from optimizer_adgrad import AdsgdAdGrad
-# from optimizer_adgrad_nesterov import AdsgdAdGradNesterov
-from optimizer_adaptive_npgm import AdaptiveNPGM
+from optimizer_adgrad_nesterov import AdsgdAdGradNesterov
+# from optimizer_adaptive_npgm import AdaptiveNPGM
 # from optimizer_adaptive_npgm2 import AdaptiveNPGM
 
 
@@ -49,16 +49,16 @@ def run_adgd(net, n_epoch=2, amplifier=0.02, damping=1, weight_decay=0, eps=1e-8
     # initial_lr = 1e-2
     initial_lr = 1e-1  # ή 0.05
 
-    # optimizer = AdsgdAdGradNesterov(net.parameters(),
-    #                                 lr=initial_lr,
-    #                                 weight_decay=weight_decay,
-    #                                 tau_rule='original')  # ή 'mod'
-    # prev_optimizer = AdsgdAdGradNesterov(prev_net.parameters(),
-    #                                      lr=initial_lr,
-    #                                      weight_decay=weight_decay,
-    #                                      tau_rule='original')
-    optimizer = AdaptiveNPGM(net.parameters(), lr=initial_lr, weight_decay=weight_decay)
-    prev_optimizer = AdaptiveNPGM(prev_net.parameters(), lr=initial_lr, weight_decay=weight_decay)
+    optimizer = AdsgdAdGradNesterov(net.parameters(),
+                                    lr=initial_lr,
+                                    weight_decay=weight_decay,
+                                    tau_rule='original')  # ή 'mod'
+    prev_optimizer = AdsgdAdGradNesterov(prev_net.parameters(),
+                                         lr=initial_lr,
+                                         weight_decay=weight_decay,
+                                         tau_rule='original')
+    # optimizer = AdaptiveNPGM(net.parameters(), lr=initial_lr, weight_decay=weight_decay)
+    # prev_optimizer = AdaptiveNPGM(prev_net.parameters(), lr=initial_lr, weight_decay=weight_decay)
 
     for epoch in range(n_epoch):  # loop over the dataset multiple times
 
