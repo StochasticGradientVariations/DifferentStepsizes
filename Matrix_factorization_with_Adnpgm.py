@@ -69,7 +69,8 @@ def main():
     X0 = sigma * np.random.randn(m+n, r)
 
     # Params
-    N     = 30000
+    N = 30000
+    L_gd = 1000
     L_nes = 30000
 
     # Συναρτήσεις διεπαφής
