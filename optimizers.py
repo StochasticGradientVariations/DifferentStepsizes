@@ -409,168 +409,172 @@ class NestLine(Trainer):
         self.A = 0
         self.v = self.w.copy()
 
-class AdgdK1OverK(Trainer):
-    """
-    Adaptive gradient descent με τ1 = (k+1)/k * lr_prev και τ2 = 0.5 * ||Δx||/||Δg||.
-    """
-    def __init__(self, lr0=None, *args, **kwargs):
-        super(AdgdK1OverK, self).__init__(*args, **kwargs)
-        self.lr0 = lr0
+#####################
+##  To be deleted  ##
+#####################
 
-    def init_run(self, w0):
-        # Καλούμε πρώτα το base init_run ώστε να οριστούν self.w, self.it, κλπ.
-        super(AdgdK1OverK, self).init_run(w0)
+# class AdgdK1OverK(Trainer):
+#     """
+#     Adaptive gradient descent με τ1 = (k+1)/k * lr_prev και τ2 = 0.5 * ||Δx||/||Δg||.
+#     """
+#     def __init__(self, lr0=None, *args, **kwargs):
+#         super(AdgdK1OverK, self).__init__(*args, **kwargs)
+#         self.lr0 = lr0
+#
+#     def init_run(self, w0):
+#         # Καλούμε πρώτα το base init_run ώστε να οριστούν self.w, self.it, κλπ.
+#         super(AdgdK1OverK, self).init_run(w0)
+#
+#         # Αρχικός learning rate
+#         if self.lr0 is None:
+#             self.lr0 = 1e-10
+#         self.lr = self.lr0
+#         self.theta = np.inf
+#
+#         # Υπολογίζουμε την πρώτη κλίση και την αποθηκεύουμε σε self.grad
+#         grad = self.grad_func(self.w)
+#         self.grad = grad
+#
+#         # Αρχικές τιμές για curvature‐bound
+#         self.w_old    = self.w.copy()
+#         self.grad_old = grad
+#
+#         # Πρώτο βήμα
+#         self.w -= self.lr * grad
+#         self.save_checkpoint()
+#
+#     def estimate_stepsize(self):
+#         k = max(1, self.it)
+#         # τ1 = (k+1)/k * lr_prev
+#         tau1 = (k+1)/k * self.lr
+#         # τ2 = 0.5 * ||Δx|| / ||Δg||
+#         denom = la.norm(self.w - self.w_old) + 1e-12
+#         Lloc  = la.norm(self.grad - self.grad_old) / denom
+#         tau2  = 0.5 / Lloc
+#         lr_new = min(tau1, tau2)
+#
+#         # Ενημέρωση του learning rate
+#         self.theta = lr_new / self.lr
+#         self.lr = lr_new
+#
+#     def step(self):
+#         # Αποθήκευση παλιών τιμών για το επόμενο estimate
+#         self.w_old    = self.w.copy()
+#         self.grad_old = self.grad.copy()
+#
+#         # Κανονικό πλήρες‐gradient update
+#         return self.w - self.lr * self.grad
 
-        # Αρχικός learning rate
-        if self.lr0 is None:
-            self.lr0 = 1e-10
-        self.lr = self.lr0
-        self.theta = np.inf
+# class AdgdKOverKplus3(Trainer):
+#     """
+#     Adaptive gradient descent με τ1 = k/(k+3) * lr_prev και τ2 = 0.5 * ||Δx||/||Δg||.
+#     """
+#     def __init__(self, lr0=None, *args, **kwargs):
+#         super(AdgdKOverKplus3, self).__init__(*args, **kwargs)
+#         self.lr0 = lr0
+#
+#     def init_run(self, w0):
+#         # 1) θεμέλιο init
+#         super(AdgdKOverKplus3, self).init_run(w0)
+#
+#         # 2) αρχικός LR
+#         if self.lr0 is None:
+#             self.lr0 = 1e-10
+#         self.lr = self.lr0
+#
+#         # 3) υπολογισμός και αποθήκευση πρώτης κλίσης
+#         grad      = self.grad_func(self.w)
+#         self.grad = grad
+#
+#         # 4) curvature‐state
+#         self.w_old    = self.w.copy()
+#         self.grad_old = grad
+#
+#         # 5) πρώτο βήμα
+#         self.w -= self.lr * grad
+#         self.save_checkpoint()
+#
+#     def estimate_stepsize(self):
+#         k = max(1, self.it)
+#         tau1 = k/(k+3) * self.lr
+#         denom = la.norm(self.w - self.w_old) + 1e-12
+#         Lloc  = la.norm(self.grad - self.grad_old) / denom
+#         tau2  = 0.5 / Lloc
+#         self.lr = min(tau1, tau2)
+#
+#     def step(self):
+#         self.w_old    = self.w.copy()
+#         self.grad_old = self.grad.copy()
+#         return self.w - self.lr * self.grad
 
-        # Υπολογίζουμε την πρώτη κλίση και την αποθηκεύουμε σε self.grad
-        grad = self.grad_func(self.w)
-        self.grad = grad
-
-        # Αρχικές τιμές για curvature‐bound
-        self.w_old    = self.w.copy()
-        self.grad_old = grad
-
-        # Πρώτο βήμα
-        self.w -= self.lr * grad
-        self.save_checkpoint()
-
-    def estimate_stepsize(self):
-        k = max(1, self.it)
-        # τ1 = (k+1)/k * lr_prev
-        tau1 = (k+1)/k * self.lr
-        # τ2 = 0.5 * ||Δx|| / ||Δg||
-        denom = la.norm(self.w - self.w_old) + 1e-12
-        Lloc  = la.norm(self.grad - self.grad_old) / denom
-        tau2  = 0.5 / Lloc
-        lr_new = min(tau1, tau2)
-
-        # Ενημέρωση του learning rate
-        self.theta = lr_new / self.lr
-        self.lr = lr_new
-
-    def step(self):
-        # Αποθήκευση παλιών τιμών για το επόμενο estimate
-        self.w_old    = self.w.copy()
-        self.grad_old = self.grad.copy()
-
-        # Κανονικό πλήρες‐gradient update
-        return self.w - self.lr * self.grad
-
-class AdgdKOverKplus3(Trainer):
-    """
-    Adaptive gradient descent με τ1 = k/(k+3) * lr_prev και τ2 = 0.5 * ||Δx||/||Δg||.
-    """
-    def __init__(self, lr0=None, *args, **kwargs):
-        super(AdgdKOverKplus3, self).__init__(*args, **kwargs)
-        self.lr0 = lr0
-
-    def init_run(self, w0):
-        # 1) θεμέλιο init
-        super(AdgdKOverKplus3, self).init_run(w0)
-
-        # 2) αρχικός LR
-        if self.lr0 is None:
-            self.lr0 = 1e-10
-        self.lr = self.lr0
-
-        # 3) υπολογισμός και αποθήκευση πρώτης κλίσης
-        grad      = self.grad_func(self.w)
-        self.grad = grad
-
-        # 4) curvature‐state
-        self.w_old    = self.w.copy()
-        self.grad_old = grad
-
-        # 5) πρώτο βήμα
-        self.w -= self.lr * grad
-        self.save_checkpoint()
-
-    def estimate_stepsize(self):
-        k = max(1, self.it)
-        tau1 = k/(k+3) * self.lr
-        denom = la.norm(self.w - self.w_old) + 1e-12
-        Lloc  = la.norm(self.grad - self.grad_old) / denom
-        tau2  = 0.5 / Lloc
-        self.lr = min(tau1, tau2)
-
-    def step(self):
-        self.w_old    = self.w.copy()
-        self.grad_old = self.grad.copy()
-        return self.w - self.lr * self.grad
-
-class AdaptiveGDK1onKNesterov(Trainer):
-    """
-    Adaptive GD with τ₁=(k+1)/k * lr_prev and τ₂=0.5*||Δx||/||Δg||,
-    plus Nesterov‐type momentum.
-    """
-    def __init__(self, lr0=None, *args, **kwargs):
-        super(AdaptiveGDK1onKNesterov, self).__init__(*args, **kwargs)
-        self.lr0 = lr0
-
-    def init_run(self, w0):
-        # Θεμέλιο init
-        super(AdaptiveGDK1onKNesterov, self).init_run(w0)
-
-        # Αρχικό βήμα
-        if self.lr0 is None:
-            self.lr0 = 1e-10
-        self.lr = self.lr0
-
-        # Μεταβλητές Nesterov
-        self.w_nesterov      = self.w.copy()
-        self.w_nesterov_old  = self.w.copy()
-        self.alpha           = 1.0
-        self.momentum        = 0.0
-
-        # Υπολογισμός αρχικής κλίσης
-        grad = self.grad_func(self.w)
-        self.grad = grad
-
-        # Αρχικές τιμές για curvature
-        self.w_old    = self.w.copy()
-        self.grad_old = grad
-
-        # Πρώτο GD βήμα
-        self.w -= self.lr * grad
-        self.save_checkpoint()
-
-    def estimate_stepsize(self):
-        k = max(1, self.it)
-        # τ1 = (k+1)/k * lr_prev
-        tau1 = (k+1)/k * self.lr
-        # τ2 = 0.5 * ||Δx|| / ||Δg||
-        denom = la.norm(self.w - self.w_old) + 1e-12
-        Lloc  = la.norm(self.grad - self.grad_old) / denom
-        tau2  = 0.5 / Lloc
-
-        # Ενημέρωση lr
-        self.lr = min(tau1, tau2)
-
-    def step(self):
-        # 0) πρώτα ξαναϋπολογίζουμε τη νέα κλίση
-        self.grad = self.grad_func(self.w)
-
-        # 1) Υπολογισμός νέου momentum
-        alpha_new = 0.5 * (1 + np.sqrt(1 + 4 * self.alpha ** 2))
-        self.momentum = (self.alpha - 1) / alpha_new
-        self.alpha = alpha_new
-
-        # 2) Αποθήκευση παλιών τιμών
-        self.w_old = self.w.copy()
-        self.grad_old = self.grad.copy()
-        self.w_nesterov_old = self.w_nesterov.copy()
-
-        # 3) Look‐ahead GD βήμα
-        self.w_nesterov = self.w - self.lr * self.grad
-        # 4) Nesterov combination
-        w_new = self.w_nesterov + self.momentum * (self.w_nesterov - self.w_nesterov_old)
-
-        return w_new
+# class AdaptiveGDK1onKNesterov(Trainer):
+#     """
+#     Adaptive GD with τ₁=(k+1)/k * lr_prev and τ₂=0.5*||Δx||/||Δg||,
+#     plus Nesterov‐type momentum.
+#     """
+#     def __init__(self, lr0=None, *args, **kwargs):
+#         super(AdaptiveGDK1onKNesterov, self).__init__(*args, **kwargs)
+#         self.lr0 = lr0
+#
+#     def init_run(self, w0):
+#         # Θεμέλιο init
+#         super(AdaptiveGDK1onKNesterov, self).init_run(w0)
+#
+#         # Αρχικό βήμα
+#         if self.lr0 is None:
+#             self.lr0 = 1e-10
+#         self.lr = self.lr0
+#
+#         # Μεταβλητές Nesterov
+#         self.w_nesterov      = self.w.copy()
+#         self.w_nesterov_old  = self.w.copy()
+#         self.alpha           = 1.0
+#         self.momentum        = 0.0
+#
+#         # Υπολογισμός αρχικής κλίσης
+#         grad = self.grad_func(self.w)
+#         self.grad = grad
+#
+#         # Αρχικές τιμές για curvature
+#         self.w_old    = self.w.copy()
+#         self.grad_old = grad
+#
+#         # Πρώτο GD βήμα
+#         self.w -= self.lr * grad
+#         self.save_checkpoint()
+#
+#     def estimate_stepsize(self):
+#         k = max(1, self.it)
+#         # τ1 = (k+1)/k * lr_prev
+#         tau1 = (k+1)/k * self.lr
+#         # τ2 = 0.5 * ||Δx|| / ||Δg||
+#         denom = la.norm(self.w - self.w_old) + 1e-12
+#         Lloc  = la.norm(self.grad - self.grad_old) / denom
+#         tau2  = 0.5 / Lloc
+#
+#         # Ενημέρωση lr
+#         self.lr = min(tau1, tau2)
+#
+#     def step(self):
+#         # 0) πρώτα ξαναϋπολογίζουμε τη νέα κλίση
+#         self.grad = self.grad_func(self.w)
+#
+#         # 1) Υπολογισμός νέου momentum
+#         alpha_new = 0.5 * (1 + np.sqrt(1 + 4 * self.alpha ** 2))
+#         self.momentum = (self.alpha - 1) / alpha_new
+#         self.alpha = alpha_new
+#
+#         # 2) Αποθήκευση παλιών τιμών
+#         self.w_old = self.w.copy()
+#         self.grad_old = self.grad.copy()
+#         self.w_nesterov_old = self.w_nesterov.copy()
+#
+#         # 3) Look‐ahead GD βήμα
+#         self.w_nesterov = self.w - self.lr * self.grad
+#         # 4) Nesterov combination
+#         w_new = self.w_nesterov + self.momentum * (self.w_nesterov - self.w_nesterov_old)
+#
+#         return w_new
 
 
 class AdaPGNesterov(Trainer):
@@ -578,15 +582,18 @@ class AdaPGNesterov(Trainer):
     Adaptive GD with τ₁=(k+1)/k * lr_prev and τ₂=0.5*||Δx||/||Δg||,
     plus Nesterov‐type momentum.
     """
-    def __init__(self, lr0=None, *args, **kwargs):
+    def __init__(self, lr0=None, isConservative=False, *args, **kwargs):
         super(AdaPGNesterov, self).__init__(*args, **kwargs)
         self.lr0 = lr0
+        self.isConservative = isConservative
 
     def init_run(self, w0):
-        # Θεμέλιο init
+        # First initialization
         super(AdaPGNesterov, self).init_run(w0)
+        # Set theta to infinity to avoid first computation
+        self.theta = np.inf
 
-        # Αρχικό βήμα
+        # First step
         if self.lr0 is None:
             self.lr0 = 1e-10
         self.lr = self.lr0
@@ -597,7 +604,7 @@ class AdaPGNesterov(Trainer):
         self.y = self.w.copy()
         self.y_old = self.w.copy()
 
-        # Υπολογισμός αρχικής κλίσης
+        # Compute gradient
         grad = self.grad_func(self.w)
         self.grad = grad
 
@@ -605,7 +612,7 @@ class AdaPGNesterov(Trainer):
         self.w_old    = self.w.copy()
         self.grad_old = grad
 
-        # Πρώτο GD βήμα
+        # Initial step
         self.w -= self.lr * grad
         self.save_checkpoint()
 
@@ -620,11 +627,16 @@ class AdaPGNesterov(Trainer):
         # Compute stepsize
         k = max(1, self.it)
         # tau1 = (k + 1) / k * self.lr
-        tau1 = (k+1)/k * self.lr
+        if self.isConservative:
+            tau1 = (k+1)/k * self.lr
+        else:
+            tau1 = np.sqrt(1 + self.theta) * self.lr
         denom = la.norm(self.y - self.y_old) + 1e-12
         Lloc = la.norm(self.grad - self.grad_old) / denom
         tau2 = 0.5 / Lloc
-        self.lr = min(tau1, tau2)
+        lr_new = min(tau1, tau2)
+        self.theta = lr_new / self.lr
+        self.lr = lr_new
 
         # Perform gradient step
         self.w_old = self.w.copy()
