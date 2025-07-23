@@ -16,12 +16,8 @@ from sklearn.utils.extmath import safe_sparse_dot
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from optimizers import (
-    Gd, Nesterov, Adgd, AdgdAccel,
-    ADPG_Momentum,
-    AdaptiveNPGM,
-    AdaPGNesterov
-)
+# Import optimizers
+from optimizers import *
 
 from loss_functions import logistic_gradient  # μόνο αυτό χρειαζόμαστε
 
@@ -39,6 +35,7 @@ def logistic_hessian(w, X, y, l2=0.0):
 
 def main():
     # 1) Φόρτωση mushrooms
+    fmin = 0
     repo = os.path.dirname(__file__)
     print(repo)
     X_sp, y = load_svmlight_file(os.path.join(repo, 'datasets', 'mushrooms'))
@@ -63,7 +60,7 @@ def main():
         return q + Q @ w + 0.5 * normw * w
 
     # 4) budgets & tuning
-    it_max = 1000
+    it_max = 2000
     tune = it_max // 2
 
     # 5) Lipschitz constant L0 = ‖Q‖₂
@@ -108,14 +105,22 @@ def main():
 
     # These are the main algorithms we want to compare. Standard AdGD, AccAdGD, AdGD with Nesterov
     # momentum but conservative stepsize, AdGD with Nesterov and actual stepsize
-    adgd = Adgd(eps=0.0, lr0=1.0, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
-    adacc = AdgdAccel(loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
-    adgdNesCons = AdaPGNesterov(lr0=1., isConservative=True, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
-    adgdNes = AdaPGNesterov(lr0=1., isConservative=False, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
+    adgd = Adgd(eps=0.0, lr0=1e-06, prox_type="none", fmin=fmin, reg_param=1, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
+    adacc = AdgdAccel(fmin=fmin, reg_param=1, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
+    adgdNesCons = AdaPGNesterov(lr0=1e-06, prox_type="none", fmin=fmin, reg_param=1, isConservative=True, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
+    adgdNes = AdaPGNesterov(lr0=1e-06, prox_type="none", fmin=fmin, reg_param=1, isConservative=False, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
+    # nes = Nesterov(lr=1/L, strongly_convex=False, mu=0, reg_param=1, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
+
+    print("## Nesterov with 1/L ##")
+    # nes.run(w0)    
+    print("## AdGD ##")
     adgd.run(w0)
+    print("## Nesterov AdGD conservative ##")
     adgdNesCons.run(w0)
+    print("## Nesterov AdGD ##")
     adgdNes.run(w0)
-    adacc.run(w0)
+    print("## Accelerated AdGD ##")
+    # adacc.run(w0)
 
     # # 10) Οι επιλεγμένες μέθοδοι προς σύγκριση
     # extras, labs, mks = [], [], []
