@@ -19,7 +19,8 @@ import seaborn as sns
 from optimizers import (
     Gd, Nesterov, Adgd, AdgdAccel,
     ADPG_Momentum,
-    AdaptiveNPGM
+    AdaptiveNPGM,
+    AdaPGNesterov
 )
 
 from loss_functions import logistic_gradient  # μόνο αυτό χρειαζόμαστε
@@ -39,6 +40,7 @@ def logistic_hessian(w, X, y, l2=0.0):
 def main():
     # 1) Φόρτωση mushrooms
     repo = os.path.dirname(__file__)
+    print(repo)
     X_sp, y = load_svmlight_file(os.path.join(repo, 'datasets', 'mushrooms'))
     X, y = X_sp.toarray(), y
     if set(np.unique(y)) == {1, 2}:
@@ -104,10 +106,15 @@ def main():
     # nest = Nesterov(lr=best_lr_nes, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
     # nest.run(w0)
 
-    # 9) Κλασικά AdGD & AdGD-accel
-    adgd = Adgd(eps=0.0, lr0=1.0, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
+    # These are the main algorithms we want to compare. Standard AdGD, AccAdGD, AdGD with Nesterov
+    # momentum but conservative stepsize, AdGD with Nesterov and actual stepsize
+    adgd = Adgd(eps=0.0, lr0=1.0, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
     adacc = AdgdAccel(loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
+    adgdNesCons = AdaPGNesterov(lr0=1., isConservative=True, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
+    adgdNes = AdaPGNesterov(lr0=1., isConservative=False, isVerbose=True, loss_func=loss_fn, grad_func=grad_fn, it_max=it_max)
     adgd.run(w0)
+    adgdNesCons.run(w0)
+    adgdNes.run(w0)
     adacc.run(w0)
 
     # # 10) Οι επιλεγμένες μέθοδοι προς σύγκριση
