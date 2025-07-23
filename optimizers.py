@@ -6,7 +6,7 @@ from trainer import Trainer
 
 def eval_prox(type, x, step_size, reg_param):
     if type == "l1":
-        return x
+        return np.maximum(0., np.abs(x) - reg_param*step_size) * np.sign(x)
     else:
         return x
 
@@ -107,7 +107,7 @@ class Adgd(Trainer):
         self.w_old = self.w.copy()
         self.grad_old = grad
         # self.w -= self.lr * grad
-        self.w = eval_prox(self.prox_type, self.w - self.lr * self.grad, self.lr)
+        self.w = eval_prox(self.prox_type, self.w - self.lr * grad, self.lr, self.reg_param)
         self.save_checkpoint()
         
     def update_logs(self):
@@ -285,6 +285,6 @@ class AdaPGNesterov(Trainer):
 
         # Perform gradient step
         self.w_old = self.w.copy()
-        self.w = eval_prox(self.prox_type, self.y - self.lr * self.grad, self.lr)
+        self.w = eval_prox(self.prox_type, self.y - self.lr * self.grad, self.lr, self.reg_param)
         # self.w = self.y - self.lr * self.grad
         return self.w

@@ -12,7 +12,7 @@ class Trainer:
     Base class for experiments with logistic regression. Provides methods
     for running optimization methods, saving the logs and plotting the results.
     """
-    def __init__(self, grad_func, loss_func, reg_param=0, prox_type="unconstrained", isVerbose=False, t_max=np.inf, it_max=np.inf, output_size=500, tolerance=0):
+    def __init__(self, grad_func, loss_func, fmin=0, reg_param=0, prox_type="unconstrained", isVerbose=False, t_max=np.inf, it_max=np.inf, output_size=500, tolerance=0):
         if t_max is np.inf and it_max is np.inf:
             it_max = 100
             print('The number of iterations is set to 100.')
@@ -27,6 +27,7 @@ class Trainer:
         self.isVerbose = isVerbose
         self.prox_type = prox_type
         self.reg_param = reg_param
+        self.fmin = fmin
     
     def run(self, w0):
         if self.first_run:
@@ -43,7 +44,7 @@ class Trainer:
             self.estimate_stepsize()
             self.w = self.step()
             if self.isVerbose and self.it % print_every == 0:
-                print(self.it, la.norm(self.grad_func(self.w)), self.loss_func(self.w))
+                print(self.it, la.norm(self.grad_func(self.w)), self.loss_func(self.w)-self.fmin)
 
             self.save_checkpoint()
 
