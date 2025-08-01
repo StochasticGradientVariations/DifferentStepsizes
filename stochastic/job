@@ -1,0 +1,15 @@
+#!/bin/bash -l
+
+#SBATCH --nodes=1
+#SBATCH --tasks-per-node=9
+#SBATCH --time=10:00:00
+#SBATCH --account=intro_vsc37696
+#SBATCH --cluster=genius
+#SBATCH --partition=gpu_p100
+#SBATCH --gpus-per-node=1
+
+cd $VSC_HOME/nonlinearly-preconditioned-gradient/stochastic
+module load Python/3.10.8-GCCcore-10.3.0-bare 
+python --version
+source $VSC_DATA/.venv/bin/activate
+python main_multiple.py --problem resnet --optimizer iso --lr 0.1 --epochs 120 --momentum 0
