@@ -1,10 +1,10 @@
 import torch
 import argparse
-# from problems.mnist import mnist_mlp
+from problems.mnist import mnist_mlp
 from problems.cifar_resnet import cifar_resnet18
 # from problems.wikitext import wikitext_transf
 # from problems.ptb_transformer import ptb_transf
-# from problems.fashion_mnist import fashion_mnist_cnn
+from problems.fashion_mnist import fashion_mnist_cnn
 # from problems.cifar100 import cifar100
 # from grid_search import GridSearch1D
 from optimizers.optimizers import *
@@ -35,7 +35,12 @@ def get_problem(name):
 
 def train(name, problem, momentum, lr, epochs):
     name = name.lower()
-    return problem(get_device(), lambda params: AdaptiveNPGM(params, lr=lr), seed = 2023).train(epochs=epochs)
+    if 'adaptive' in name:
+        print("adaNPGM selected")
+        return problem(get_device(), lambda params: AdaptiveNPGM(params, lr=lr), seed = 2023).train(epochs=epochs)
+    else:
+        print("adam selected")
+        return problem(get_device(), lambda params: torch.optim.Adam(params, lr), seed = 2023).train(epochs=epochs)
     
     
 def main():
@@ -43,7 +48,7 @@ def main():
     parser.add_argument('--problem', type=str, default='resnet', help="Problem to solve (e.g., mnist, resnet, wikitext, ptb, fashion, cifar100)")
     parser.add_argument('--optimizer', type=str, default='iso', help="Optimizer to use (e.g., iso, sep, adam, sgd)")
     parser.add_argument('--momentum', type=float, default='0', help="Momentum param")
-    parser.add_argument('--lr', type=float, default='1', help="Stepsize gamma")
+    parser.add_argument('--lr', type=float, default='.1', help="Stepsize gamma")
     parser.add_argument('--epochs', type=int, default='200', help="Epochs")
     # parser.add_argument('--epochs', type=int, default='200', help="Epochs")
 
