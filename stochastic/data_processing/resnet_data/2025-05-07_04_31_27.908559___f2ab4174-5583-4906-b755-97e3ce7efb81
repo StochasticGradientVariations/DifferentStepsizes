@@ -1,0 +1,227 @@
+CIFAR10 resnet 18
+self.device=device(type='cuda', index=0)
+self.optimizer=SGD (
+Parameter Group 0
+    dampening: 0
+    differentiable: False
+    foreach: None
+    lr: 0.1
+    maximize: False
+    momentum: 0.0
+    nesterov: False
+    weight_decay: 0
+)
+self.model=ResNet(
+  (conv1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (layer1): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer2): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(64, 128, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer3): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(128, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer4): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (linear): Linear(in_features=512, out_features=10, bias=True)
+)
+self.loss_fn=CrossEntropyLoss()
+dataloader.batch_size=128
+dataloader.num_workers=4
+dataloader.dataset=Dataset CIFAR10
+    Number of datapoints: 50000
+    Root location: /data/leuven/376/vsc37669/data
+    Split: Train
+    StandardTransform
+Transform: Compose(
+               RandomCrop(size=(32, 32), padding=4)
+               RandomHorizontalFlip(p=0.5)
+               ToTensor()
+               Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.201))
+           )
+self.seed=2023
+======================================================================================================================================================
+epoch=1, loss_train=1.3857770929556061, loss_test=1.4023002189925957, acc_train=0.4948, acc_test=0.4873
+epoch=2, loss_train=1.7410798017935993, loss_test=1.8517564550230774, acc_train=0.51782, acc_test=0.524
+epoch=3, loss_train=1.646981585361159, loss_test=1.9079170000704029, acc_train=0.54558, acc_test=0.5264
+epoch=4, loss_train=0.697293491238523, loss_test=0.7481790045394173, acc_train=0.75944, acc_test=0.7506
+epoch=5, loss_train=0.7920127920330027, loss_test=0.8455761829509012, acc_train=0.73678, acc_test=0.7365
+epoch=6, loss_train=0.4918851990376595, loss_test=0.5623620744747452, acc_train=0.83142, acc_test=0.8123
+epoch=7, loss_train=0.8621070958159465, loss_test=0.9875265193890921, acc_train=0.72512, acc_test=0.7136
+epoch=8, loss_train=0.48750306025642887, loss_test=0.6051384270945683, acc_train=0.82882, acc_test=0.8024
+epoch=9, loss_train=0.4566515368573809, loss_test=0.5777289222312877, acc_train=0.84304, acc_test=0.8169
+epoch=10, loss_train=0.4042733567373837, loss_test=0.5041011745416664, acc_train=0.8536, acc_test=0.8236
+epoch=11, loss_train=0.46115298832164114, loss_test=0.6331108280375035, acc_train=0.83968, acc_test=0.8047
+epoch=12, loss_train=0.39545003357140907, loss_test=0.5402822000316426, acc_train=0.86676, acc_test=0.8326
+epoch=13, loss_train=0.3331976873261851, loss_test=0.47891510589213315, acc_train=0.88184, acc_test=0.8519
+epoch=14, loss_train=0.2858805349263386, loss_test=0.42417340150362326, acc_train=0.89928, acc_test=0.8662
+epoch=15, loss_train=0.27164033596472964, loss_test=0.4254924372027191, acc_train=0.90426, acc_test=0.8626
+epoch=16, loss_train=0.40004148747762436, loss_test=0.6044595245319075, acc_train=0.86942, acc_test=0.8255
+epoch=17, loss_train=0.3292237527077763, loss_test=0.49551070830490007, acc_train=0.88292, acc_test=0.8471
+epoch=18, loss_train=0.29219104401062224, loss_test=0.5054436590098129, acc_train=0.8997, acc_test=0.8539
+epoch=19, loss_train=0.26546010609401766, loss_test=0.47584697057174735, acc_train=0.91002, acc_test=0.8686
+epoch=20, loss_train=0.21165141573799853, loss_test=0.4120535083775277, acc_train=0.92666, acc_test=0.878
+epoch=21, loss_train=0.2783747229277326, loss_test=0.5388866123519365, acc_train=0.9074, acc_test=0.8535
+epoch=22, loss_train=0.2327678153277054, loss_test=0.5049057225637799, acc_train=0.91842, acc_test=0.8602
+epoch=23, loss_train=0.19537035154793267, loss_test=0.43873460270181486, acc_train=0.93216, acc_test=0.879
+epoch=24, loss_train=0.1537198804776229, loss_test=0.39662136458143393, acc_train=0.94416, acc_test=0.8853
+epoch=25, loss_train=0.13195967786680995, loss_test=0.39408508263811287, acc_train=0.95228, acc_test=0.8905
+epoch=26, loss_train=0.11492030755581006, loss_test=0.36232474248243285, acc_train=0.95892, acc_test=0.9006
+epoch=27, loss_train=0.09810167711580657, loss_test=0.3422452840435354, acc_train=0.9641, acc_test=0.9067
+epoch=28, loss_train=0.1175122389669918, loss_test=0.3881805997483339, acc_train=0.95856, acc_test=0.8948
+epoch=29, loss_train=0.19146030047036672, loss_test=0.4934093869185148, acc_train=0.93266, acc_test=0.8723
+epoch=30, loss_train=0.12049206491092893, loss_test=0.41153816746760025, acc_train=0.95812, acc_test=0.8929
+epoch=31, loss_train=0.10171048286016035, loss_test=0.42356421798467636, acc_train=0.96314, acc_test=0.8968
+epoch=32, loss_train=0.10806693089530434, loss_test=0.40940346446218356, acc_train=0.9618, acc_test=0.8923
+epoch=33, loss_train=0.10569365099167731, loss_test=0.41295088535245467, acc_train=0.95996, acc_test=0.8973
+epoch=34, loss_train=0.14318480663706593, loss_test=0.4462509728685209, acc_train=0.95178, acc_test=0.8872
+epoch=35, loss_train=0.07945378366000282, loss_test=0.38325892539718476, acc_train=0.97204, acc_test=0.9037
+epoch=36, loss_train=0.14596989822319098, loss_test=0.5497389285813403, acc_train=0.94998, acc_test=0.8789
+epoch=37, loss_train=0.09386045028886682, loss_test=0.4555323580397835, acc_train=0.96566, acc_test=0.8942
+epoch=38, loss_train=0.07316526548956026, loss_test=0.42018712528898733, acc_train=0.97356, acc_test=0.9049
+epoch=39, loss_train=0.10443487764357602, loss_test=0.49152946538185743, acc_train=0.96102, acc_test=0.891
+epoch=40, loss_train=0.130480414056374, loss_test=0.5509215223638319, acc_train=0.95512, acc_test=0.8812
+epoch=41, loss_train=0.05768679974891261, loss_test=0.3918577760835235, acc_train=0.97912, acc_test=0.9067
+epoch=42, loss_train=0.07494493505067146, loss_test=0.4419496781841108, acc_train=0.9726, acc_test=0.9033
+epoch=43, loss_train=0.08540215723864415, loss_test=0.4639974609960484, acc_train=0.97154, acc_test=0.9002
+epoch=44, loss_train=0.058869828847582295, loss_test=0.4066528654362582, acc_train=0.97978, acc_test=0.9085
+epoch=45, loss_train=0.04028794293642003, loss_test=0.4075884119242052, acc_train=0.98544, acc_test=0.9136
+epoch=46, loss_train=0.058258474730622116, loss_test=0.43131512101692476, acc_train=0.98042, acc_test=0.9059
+epoch=47, loss_train=0.029606237717549243, loss_test=0.38744734774661976, acc_train=0.99002, acc_test=0.916
+epoch=48, loss_train=0.06570125954068455, loss_test=0.4687847515827491, acc_train=0.97762, acc_test=0.8992
+epoch=49, loss_train=0.07191413763405564, loss_test=0.4624007185803183, acc_train=0.97486, acc_test=0.9036
+epoch=50, loss_train=0.026480900005811377, loss_test=0.4070257511037058, acc_train=0.99102, acc_test=0.9163
+epoch=51, loss_train=0.06143621162242248, loss_test=0.48157738582997384, acc_train=0.9795, acc_test=0.904
+epoch=52, loss_train=0.034734521204096, loss_test=0.46813637829279614, acc_train=0.98716, acc_test=0.9098
+epoch=53, loss_train=0.048224393058034686, loss_test=0.4848581483658356, acc_train=0.9827, acc_test=0.9044
+epoch=54, loss_train=0.03506383968307577, loss_test=0.4177014778214919, acc_train=0.98794, acc_test=0.9142
+epoch=55, loss_train=0.045075476860336944, loss_test=0.4510154064886177, acc_train=0.98456, acc_test=0.913
+epoch=56, loss_train=0.03586535447674906, loss_test=0.41024320657494706, acc_train=0.98796, acc_test=0.9153
+epoch=57, loss_train=0.026534967967654446, loss_test=0.42128238845852367, acc_train=0.9906, acc_test=0.9152
+epoch=58, loss_train=0.02686738891615186, loss_test=0.43376904037557085, acc_train=0.99034, acc_test=0.9161
+epoch=59, loss_train=0.03285019069521802, loss_test=0.44579514427275607, acc_train=0.98706, acc_test=0.9159
+epoch=60, loss_train=0.03610648461284067, loss_test=0.45266704695134224, acc_train=0.9877, acc_test=0.9144
+epoch=61, loss_train=0.021482228552160403, loss_test=0.4200988865539997, acc_train=0.99268, acc_test=0.9184
+epoch=62, loss_train=0.04144648996823708, loss_test=0.4834036969497234, acc_train=0.987, acc_test=0.9092
+epoch=63, loss_train=0.03374823022311045, loss_test=0.46261254509415795, acc_train=0.98882, acc_test=0.9132
+epoch=64, loss_train=0.026509589960743832, loss_test=0.4747791748635376, acc_train=0.99088, acc_test=0.9126
+epoch=65, loss_train=0.02232947258744389, loss_test=0.4536669127926042, acc_train=0.99186, acc_test=0.9179
+epoch=66, loss_train=0.017861069053235215, loss_test=0.4236975842261619, acc_train=0.99456, acc_test=0.9205
+epoch=67, loss_train=0.014907533114286543, loss_test=0.4205926625600344, acc_train=0.99452, acc_test=0.9184
+epoch=68, loss_train=0.01770912025682389, loss_test=0.4291558303410493, acc_train=0.994, acc_test=0.9174
+epoch=69, loss_train=0.046990065437043683, loss_test=0.5145479746257201, acc_train=0.98402, acc_test=0.904
+epoch=70, loss_train=0.0173910522475884, loss_test=0.4550776010072683, acc_train=0.99366, acc_test=0.9152
+epoch=71, loss_train=0.02587387388687619, loss_test=0.4813788453989393, acc_train=0.99074, acc_test=0.9135
+epoch=72, loss_train=0.012761764029157643, loss_test=0.44309437322088435, acc_train=0.99546, acc_test=0.9213
+epoch=73, loss_train=0.022340452704710245, loss_test=0.44969215423245984, acc_train=0.99322, acc_test=0.916
+epoch=74, loss_train=0.011443791942789442, loss_test=0.42723064586708814, acc_train=0.99658, acc_test=0.924
+epoch=75, loss_train=0.019151709452325066, loss_test=0.45218280127531385, acc_train=0.9936, acc_test=0.9208
+epoch=76, loss_train=0.015288836590837353, loss_test=0.4673190354546413, acc_train=0.9948, acc_test=0.9181
+epoch=77, loss_train=0.009354390402692508, loss_test=0.42408079012662553, acc_train=0.99678, acc_test=0.9282
+epoch=78, loss_train=0.009462142478973288, loss_test=0.4537855517826504, acc_train=0.99632, acc_test=0.9208
+epoch=79, loss_train=0.011224138122165097, loss_test=0.4570536192836642, acc_train=0.99596, acc_test=0.9251
+epoch=80, loss_train=0.014139458306950743, loss_test=0.4638556877646266, acc_train=0.99442, acc_test=0.9183
+epoch=81, loss_train=0.034005236942642646, loss_test=0.5380319711528246, acc_train=0.98786, acc_test=0.9088
+epoch=82, loss_train=0.03311161923905848, loss_test=0.5309570990031279, acc_train=0.99016, acc_test=0.9108
+epoch=83, loss_train=0.00975170734186914, loss_test=0.4378880343482466, acc_train=0.99656, acc_test=0.9211
+epoch=84, loss_train=0.017931920899193755, loss_test=0.49775106771082805, acc_train=0.99376, acc_test=0.9145
+epoch=85, loss_train=0.009745334616646078, loss_test=0.44866302279354636, acc_train=0.99698, acc_test=0.9231
+epoch=86, loss_train=0.01749425331714784, loss_test=0.46114171428393697, acc_train=0.99412, acc_test=0.9193
+epoch=87, loss_train=0.00846245039957534, loss_test=0.4534346039489478, acc_train=0.99702, acc_test=0.923
+epoch=88, loss_train=0.013076055663577673, loss_test=0.4628795943682708, acc_train=0.99558, acc_test=0.9182
+epoch=89, loss_train=0.03138212145328799, loss_test=0.5468252372421041, acc_train=0.98936, acc_test=0.912
+epoch=90, loss_train=0.008684877663117015, loss_test=0.46989554171509407, acc_train=0.9967, acc_test=0.9244
+epoch=91, loss_train=0.011089898166446193, loss_test=0.48722723107549204, acc_train=0.99676, acc_test=0.9222
+epoch=92, loss_train=0.014061466789656422, loss_test=0.5041331409276286, acc_train=0.99554, acc_test=0.9175
+epoch=93, loss_train=0.010767431415142881, loss_test=0.4507240786959854, acc_train=0.99674, acc_test=0.9257
+epoch=94, loss_train=0.012847294475001339, loss_test=0.4842810355409791, acc_train=0.99548, acc_test=0.9219
+epoch=95, loss_train=0.03634195947109141, loss_test=0.5476638736038268, acc_train=0.98946, acc_test=0.9139
+epoch=96, loss_train=0.01173213837940581, loss_test=0.5196326731503764, acc_train=0.99552, acc_test=0.9211
+epoch=97, loss_train=0.005034485556579896, loss_test=0.4591732224968227, acc_train=0.99808, acc_test=0.9272
+epoch=98, loss_train=0.004488127889687615, loss_test=0.447322272801701, acc_train=0.99878, acc_test=0.9289
+epoch=99, loss_train=0.014017961293873093, loss_test=0.5013281043760385, acc_train=0.99508, acc_test=0.9254
+epoch=100, loss_train=0.049311333813953466, loss_test=0.6066017418722562, acc_train=0.98568, acc_test=0.9047
+epoch=101, loss_train=0.007980076558942298, loss_test=0.4778608156344559, acc_train=0.9974, acc_test=0.9234
+epoch=102, loss_train=0.010159475343299508, loss_test=0.5131048848263069, acc_train=0.99636, acc_test=0.9211
+epoch=103, loss_train=0.008540280571895478, loss_test=0.46070915205946456, acc_train=0.99682, acc_test=0.9246
+epoch=104, loss_train=0.004683506601607166, loss_test=0.4369523433756225, acc_train=0.99836, acc_test=0.927
+epoch=105, loss_train=0.00722773907018517, loss_test=0.47846787017357495, acc_train=0.99718, acc_test=0.9254
+epoch=106, loss_train=0.008649709873975385, loss_test=0.47229879915337003, acc_train=0.99688, acc_test=0.922
+epoch=107, loss_train=0.00708381119011509, loss_test=0.46572336427207234, acc_train=0.99736, acc_test=0.9267
+epoch=108, loss_train=0.006133685557572459, loss_test=0.48103089913537234, acc_train=0.99786, acc_test=0.9251
+epoch=109, loss_train=0.009605198908965537, loss_test=0.4894382984766479, acc_train=0.9972, acc_test=0.9218
+epoch=110, loss_train=0.011075208212233796, loss_test=0.517086019810242, acc_train=0.99606, acc_test=0.9202
+epoch=111, loss_train=0.004901207493027274, loss_test=0.47058519631435597, acc_train=0.99852, acc_test=0.9265
+epoch=112, loss_train=0.004494274187556322, loss_test=0.4623573781285859, acc_train=0.99848, acc_test=0.9275
+epoch=113, loss_train=0.0075607566374188495, loss_test=0.4929012886331052, acc_train=0.99726, acc_test=0.9222
+epoch=114, loss_train=0.003517694607841299, loss_test=0.4768654156617725, acc_train=0.9985, acc_test=0.9255
+epoch=115, loss_train=0.009117328551012245, loss_test=0.5124930102095195, acc_train=0.9972, acc_test=0.925
+epoch=116, loss_train=0.00836550978538932, loss_test=0.5171497012429601, acc_train=0.99732, acc_test=0.9226
+epoch=117, loss_train=0.0061128590329721545, loss_test=0.5004133666052094, acc_train=0.99822, acc_test=0.9249
+epoch=118, loss_train=0.0031691087577926697, loss_test=0.4767188189339032, acc_train=0.99888, acc_test=0.9255
+epoch=119, loss_train=0.008728869749302948, loss_test=0.4965539769847182, acc_train=0.99716, acc_test=0.9227
+epoch=120, loss_train=0.004622463673136445, loss_test=0.47292788845451555, acc_train=0.99856, acc_test=0.9261

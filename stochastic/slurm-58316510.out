@@ -1,0 +1,20 @@
+SLURM_JOB_ID: 58316510
+SLURM_JOB_USER: vsc37696
+SLURM_JOB_ACCOUNT: intro_vsc37696
+SLURM_JOB_NAME: job
+SLURM_CLUSTER_NAME: genius
+SLURM_JOB_PARTITION: gpu_p100
+SLURM_NNODES: 1
+SLURM_NODELIST: r22g41
+SLURM_JOB_CPUS_PER_NODE: 9
+SLURM_JOB_GPUS: 3
+Date: Thu Jul 31 23:03:16 CEST 2025
+Walltime: 00-14:00:00
+========================================================================
+/var/spool/slurmd/job58316510/slurm_script: line 11: cd: /user/leuven/376/vsc37696/nonlinearly-preconditioned-gradient/stochastic: No such file or directory
+Python 3.10.8
+/var/spool/slurmd/job58316510/slurm_script: line 14: /data/leuven/376/vsc37696/env2/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/vsc-hard-mounts/leuven-user/376/vsc37696/DifferentStepsizes/stochastic/main_multiple.py", line 1, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'

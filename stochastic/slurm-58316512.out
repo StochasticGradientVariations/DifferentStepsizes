@@ -1,0 +1,269 @@
+SLURM_JOB_ID: 58316512
+SLURM_JOB_USER: vsc37696
+SLURM_JOB_ACCOUNT: intro_vsc37696
+SLURM_JOB_NAME: job
+SLURM_CLUSTER_NAME: genius
+SLURM_JOB_PARTITION: gpu_p100
+SLURM_NNODES: 1
+SLURM_NODELIST: r22g41
+SLURM_JOB_CPUS_PER_NODE: 9
+SLURM_JOB_GPUS: 3
+Date: Thu Jul 31 23:09:29 CEST 2025
+Walltime: 00-10:00:00
+========================================================================
+/var/spool/slurmd/job58316512/slurm_script: line 11: cd: /user/leuven/376/vsc37696/nonlinearly-preconditioned-gradient/stochastic: No such file or directory
+Python 3.10.8
+Namespace(problem='resnet', optimizer='iso', momentum=0.0, lr=0.1, epochs=120)
+[INFO] resnet selected
+cuda:0
+Files already downloaded and verified
+Files already downloaded and verified
+[INFO] STARTING TRAINING
+CIFAR10 resnet 18
+2024
+After epoch=1: loss train=1.5087132634, loss_test=1.4845257168, acc_train=0.4330800000, acc_test=0.4363000000
+After epoch=2: loss train=1.3140165845, loss_test=1.3041729821, acc_train=0.5322600000, acc_test=0.5353000000
+After epoch=3: loss train=0.9710533035, loss_test=0.9948169996, acc_train=0.6529600000, acc_test=0.6432000000
+After epoch=4: loss train=0.9308686090, loss_test=0.9632540240, acc_train=0.6782000000, acc_test=0.6774000000
+After epoch=5: loss train=0.8457856924, loss_test=0.9161035924, acc_train=0.7131400000, acc_test=0.7098000000
+After epoch=6: loss train=0.6021329484, loss_test=0.6600786044, acc_train=0.7897600000, acc_test=0.7736000000
+After epoch=7: loss train=0.6498912135, loss_test=0.7083028276, acc_train=0.7675200000, acc_test=0.7574000000
+After epoch=8: loss train=0.5010461930, loss_test=0.5684794934, acc_train=0.8220000000, acc_test=0.8020000000
+After epoch=9: loss train=0.4999461489, loss_test=0.5960136863, acc_train=0.8262000000, acc_test=0.8029000000
+After epoch=10: loss train=0.3869113170, loss_test=0.4762719772, acc_train=0.8610600000, acc_test=0.8319000000
+After epoch=11: loss train=0.3635218894, loss_test=0.4619341313, acc_train=0.8714200000, acc_test=0.8455000000
+After epoch=12: loss train=0.4278477947, loss_test=0.5788686822, acc_train=0.8504200000, acc_test=0.8159000000
+After epoch=13: loss train=0.2960811832, loss_test=0.4177129616, acc_train=0.8953800000, acc_test=0.8644000000
+After epoch=14: loss train=0.3357741740, loss_test=0.4916939253, acc_train=0.8851800000, acc_test=0.8522000000
+After epoch=15: loss train=0.2519278730, loss_test=0.3957029342, acc_train=0.9110400000, acc_test=0.8709000000
+After epoch=16: loss train=0.2558551945, loss_test=0.4124642599, acc_train=0.9093400000, acc_test=0.8696000000
+After epoch=17: loss train=0.2656536457, loss_test=0.4291299341, acc_train=0.9085200000, acc_test=0.8650000000
+After epoch=18: loss train=0.2822092890, loss_test=0.4526210867, acc_train=0.8998000000, acc_test=0.8575000000
+After epoch=19: loss train=0.2658893441, loss_test=0.4623075714, acc_train=0.9083000000, acc_test=0.8629000000
+After epoch=20: loss train=0.1941777281, loss_test=0.3595856481, acc_train=0.9310600000, acc_test=0.8841000000
+After epoch=21: loss train=0.2202369478, loss_test=0.4403719734, acc_train=0.9224800000, acc_test=0.8720000000
+After epoch=22: loss train=0.2090140797, loss_test=0.4176790841, acc_train=0.9284200000, acc_test=0.8743000000
+After epoch=23: loss train=0.1445890883, loss_test=0.3642403201, acc_train=0.9506600000, acc_test=0.8901000000
+After epoch=24: loss train=0.1672156429, loss_test=0.4201836092, acc_train=0.9399200000, acc_test=0.8788000000
+After epoch=25: loss train=0.1400676567, loss_test=0.4036285762, acc_train=0.9508200000, acc_test=0.8915000000
+After epoch=26: loss train=0.1139304359, loss_test=0.3432254146, acc_train=0.9590600000, acc_test=0.9006000000
+After epoch=27: loss train=0.1158451505, loss_test=0.3860467531, acc_train=0.9579600000, acc_test=0.8936000000
+After epoch=28: loss train=0.1213481100, loss_test=0.4089394874, acc_train=0.9564000000, acc_test=0.8963000000
+After epoch=29: loss train=0.1996139295, loss_test=0.5070451283, acc_train=0.9307800000, acc_test=0.8669000000
+After epoch=30: loss train=0.1143257078, loss_test=0.3894056100, acc_train=0.9586000000, acc_test=0.8973000000
+After epoch=31: loss train=0.1033342643, loss_test=0.3867797401, acc_train=0.9643600000, acc_test=0.8950000000
+After epoch=32: loss train=0.0776176230, loss_test=0.3599695646, acc_train=0.9729400000, acc_test=0.9058000000
+After epoch=33: loss train=0.0956100833, loss_test=0.3823599165, acc_train=0.9654000000, acc_test=0.8994000000
+After epoch=34: loss train=0.0661342011, loss_test=0.3749453312, acc_train=0.9762600000, acc_test=0.9068000000
+After epoch=35: loss train=0.0665703881, loss_test=0.4266901095, acc_train=0.9755400000, acc_test=0.9012000000
+After epoch=36: loss train=0.0634950395, loss_test=0.3985902692, acc_train=0.9775400000, acc_test=0.9053000000
+After epoch=37: loss train=0.1144912508, loss_test=0.4877496118, acc_train=0.9582400000, acc_test=0.8912000000
+After epoch=38: loss train=0.1417661099, loss_test=0.5175897079, acc_train=0.9535800000, acc_test=0.8860000000
+After epoch=39: loss train=0.0628694197, loss_test=0.4078935415, acc_train=0.9781200000, acc_test=0.9093000000
+After epoch=40: loss train=0.0707439723, loss_test=0.4301997232, acc_train=0.9760600000, acc_test=0.9009000000
+After epoch=41: loss train=0.0785577926, loss_test=0.4506748596, acc_train=0.9718400000, acc_test=0.9000000000
+After epoch=42: loss train=0.0484688802, loss_test=0.3932777617, acc_train=0.9835400000, acc_test=0.9131000000
+After epoch=43: loss train=0.0386843949, loss_test=0.3706222487, acc_train=0.9865600000, acc_test=0.9117000000
+After epoch=44: loss train=0.0424500944, loss_test=0.4068606849, acc_train=0.9847200000, acc_test=0.9112000000
+After epoch=45: loss train=0.0422293525, loss_test=0.3734729691, acc_train=0.9852000000, acc_test=0.9146000000
+After epoch=46: loss train=0.0440601507, loss_test=0.4059260667, acc_train=0.9844000000, acc_test=0.9102000000
+After epoch=47: loss train=0.0447323083, loss_test=0.4136507517, acc_train=0.9838200000, acc_test=0.9104000000
+After epoch=48: loss train=0.0337367329, loss_test=0.4101413792, acc_train=0.9878400000, acc_test=0.9140000000
+After epoch=49: loss train=0.0455570520, loss_test=0.4038930556, acc_train=0.9837200000, acc_test=0.9113000000
+After epoch=50: loss train=0.0460544445, loss_test=0.4226221738, acc_train=0.9836400000, acc_test=0.9081000000
+After epoch=51: loss train=0.0273572768, loss_test=0.3826484923, acc_train=0.9899800000, acc_test=0.9182000000
+After epoch=52: loss train=0.0305043141, loss_test=0.3925192051, acc_train=0.9899200000, acc_test=0.9166000000
+After epoch=53: loss train=0.0310526774, loss_test=0.4064818135, acc_train=0.9887800000, acc_test=0.9148000000
+After epoch=54: loss train=0.0280491126, loss_test=0.4017223560, acc_train=0.9892600000, acc_test=0.9146000000
+After epoch=55: loss train=0.0620927323, loss_test=0.4656625207, acc_train=0.9804400000, acc_test=0.9071000000
+After epoch=56: loss train=0.0288187871, loss_test=0.4262768641, acc_train=0.9899800000, acc_test=0.9142000000
+After epoch=57: loss train=0.0190367603, loss_test=0.3780762620, acc_train=0.9937200000, acc_test=0.9206000000
+After epoch=58: loss train=0.0493809578, loss_test=0.4587529309, acc_train=0.9854200000, acc_test=0.9132000000
+After epoch=59: loss train=0.0221982117, loss_test=0.4426365881, acc_train=0.9924800000, acc_test=0.9170000000
+After epoch=60: loss train=0.0246715792, loss_test=0.4156079792, acc_train=0.9912800000, acc_test=0.9202000000
+After epoch=61: loss train=0.0221116793, loss_test=0.4389825149, acc_train=0.9922200000, acc_test=0.9169000000
+After epoch=62: loss train=0.0288669738, loss_test=0.4579648970, acc_train=0.9895600000, acc_test=0.9177000000
+After epoch=63: loss train=0.0258251421, loss_test=0.4381732352, acc_train=0.9903800000, acc_test=0.9154000000
+After epoch=64: loss train=0.0245474404, loss_test=0.4001299944, acc_train=0.9919800000, acc_test=0.9171000000
+After epoch=65: loss train=0.0239570035, loss_test=0.4039655218, acc_train=0.9915800000, acc_test=0.9183000000
+After epoch=66: loss train=0.0129011489, loss_test=0.4226944594, acc_train=0.9955400000, acc_test=0.9225000000
+After epoch=67: loss train=0.0275441803, loss_test=0.4633115168, acc_train=0.9899200000, acc_test=0.9136000000
+After epoch=68: loss train=0.0323962743, loss_test=0.4774038079, acc_train=0.9887200000, acc_test=0.9134000000
+After epoch=69: loss train=0.0160583737, loss_test=0.3897675672, acc_train=0.9948000000, acc_test=0.9218000000
+After epoch=70: loss train=0.0278590569, loss_test=0.4487340882, acc_train=0.9902800000, acc_test=0.9170000000
+After epoch=71: loss train=0.0335656795, loss_test=0.4827818369, acc_train=0.9890000000, acc_test=0.9123000000
+After epoch=72: loss train=0.0173476139, loss_test=0.4283010880, acc_train=0.9936200000, acc_test=0.9186000000
+After epoch=73: loss train=0.0144740360, loss_test=0.4165094452, acc_train=0.9954200000, acc_test=0.9220000000
+After epoch=74: loss train=0.0201993245, loss_test=0.4479733389, acc_train=0.9928400000, acc_test=0.9176000000
+After epoch=75: loss train=0.0154782010, loss_test=0.4640092732, acc_train=0.9951800000, acc_test=0.9216000000
+After epoch=76: loss train=0.0160478365, loss_test=0.4705610522, acc_train=0.9946400000, acc_test=0.9191000000
+After epoch=77: loss train=0.0092200234, loss_test=0.4692315237, acc_train=0.9973000000, acc_test=0.9213000000
+After epoch=78: loss train=0.0116068288, loss_test=0.4505068383, acc_train=0.9960400000, acc_test=0.9237000000
+After epoch=79: loss train=0.0173476408, loss_test=0.4511091500, acc_train=0.9944200000, acc_test=0.9187000000
+After epoch=80: loss train=0.0131647893, loss_test=0.4484022895, acc_train=0.9958800000, acc_test=0.9174000000
+After epoch=81: loss train=0.0117536800, loss_test=0.4168539229, acc_train=0.9965400000, acc_test=0.9234000000
+After epoch=82: loss train=0.0165550230, loss_test=0.4601956845, acc_train=0.9943200000, acc_test=0.9146000000
+After epoch=83: loss train=0.0473415641, loss_test=0.5575833666, acc_train=0.9843600000, acc_test=0.9067000000
+After epoch=84: loss train=0.0176372885, loss_test=0.4593547692, acc_train=0.9937400000, acc_test=0.9188000000
+After epoch=85: loss train=0.0202282631, loss_test=0.4863522424, acc_train=0.9923600000, acc_test=0.9162000000
+After epoch=86: loss train=0.0122434214, loss_test=0.4495840803, acc_train=0.9958800000, acc_test=0.9220000000
+After epoch=87: loss train=0.0078028017, loss_test=0.4163458396, acc_train=0.9974200000, acc_test=0.9252000000
+After epoch=88: loss train=0.0080280801, loss_test=0.4371267931, acc_train=0.9968400000, acc_test=0.9245000000
+After epoch=89: loss train=0.0195821188, loss_test=0.4984034484, acc_train=0.9941600000, acc_test=0.9203000000
+After epoch=90: loss train=0.0129058627, loss_test=0.5132051559, acc_train=0.9954600000, acc_test=0.9197000000
+After epoch=91: loss train=0.0084701737, loss_test=0.4486000099, acc_train=0.9969800000, acc_test=0.9252000000
+After epoch=92: loss train=0.0077765354, loss_test=0.4291487491, acc_train=0.9973000000, acc_test=0.9249000000
+After epoch=93: loss train=0.0093779415, loss_test=0.4512785350, acc_train=0.9967400000, acc_test=0.9214000000
+After epoch=94: loss train=0.0102795053, loss_test=0.4476137850, acc_train=0.9962400000, acc_test=0.9206000000
+After epoch=95: loss train=0.0164644816, loss_test=0.4596465095, acc_train=0.9941400000, acc_test=0.9210000000
+After epoch=96: loss train=0.0100181744, loss_test=0.4266873041, acc_train=0.9964800000, acc_test=0.9231000000
+After epoch=97: loss train=0.0075874321, loss_test=0.4413789047, acc_train=0.9970400000, acc_test=0.9259000000
+After epoch=98: loss train=0.0097416254, loss_test=0.4424085862, acc_train=0.9970200000, acc_test=0.9252000000
+After epoch=99: loss train=0.0074061522, loss_test=0.4621835271, acc_train=0.9975200000, acc_test=0.9255000000
+After epoch=100: loss train=0.0070688958, loss_test=0.4684528437, acc_train=0.9972600000, acc_test=0.9248000000
+After epoch=101: loss train=0.0077844527, loss_test=0.4359964545, acc_train=0.9974800000, acc_test=0.9229000000
+After epoch=102: loss train=0.0135868405, loss_test=0.4956134025, acc_train=0.9949200000, acc_test=0.9174000000
+After epoch=103: loss train=0.0134718082, loss_test=0.4875568052, acc_train=0.9956200000, acc_test=0.9240000000
+After epoch=104: loss train=0.0127922540, loss_test=0.4793207227, acc_train=0.9952800000, acc_test=0.9185000000
+After epoch=105: loss train=0.0147468683, loss_test=0.4949916530, acc_train=0.9952800000, acc_test=0.9197000000
+After epoch=106: loss train=0.0071664984, loss_test=0.4511507441, acc_train=0.9973400000, acc_test=0.9243000000
+After epoch=107: loss train=0.0098786433, loss_test=0.4679600175, acc_train=0.9963800000, acc_test=0.9248000000
+After epoch=108: loss train=0.0072361039, loss_test=0.4407687335, acc_train=0.9971200000, acc_test=0.9261000000
+After epoch=109: loss train=0.0079409633, loss_test=0.4765289673, acc_train=0.9970800000, acc_test=0.9246000000
+After epoch=110: loss train=0.0212291036, loss_test=0.5663266823, acc_train=0.9928600000, acc_test=0.9142000000
+After epoch=111: loss train=0.0088702822, loss_test=0.4786132816, acc_train=0.9971000000, acc_test=0.9230000000
+After epoch=112: loss train=0.0081271742, loss_test=0.4825933298, acc_train=0.9972200000, acc_test=0.9233000000
+After epoch=113: loss train=0.0148077476, loss_test=0.5064435984, acc_train=0.9958400000, acc_test=0.9194000000
+After epoch=114: loss train=0.0071665625, loss_test=0.5009647382, acc_train=0.9976800000, acc_test=0.9238000000
+After epoch=115: loss train=0.0142758590, loss_test=0.5292473945, acc_train=0.9957000000, acc_test=0.9198000000
+After epoch=116: loss train=0.0076101926, loss_test=0.4467070893, acc_train=0.9975200000, acc_test=0.9250000000
+After epoch=117: loss train=0.0087428406, loss_test=0.4144381498, acc_train=0.9973600000, acc_test=0.9275000000
+After epoch=118: loss train=0.0042753349, loss_test=0.4622509986, acc_train=0.9990000000, acc_test=0.9272000000
+After epoch=119: loss train=0.0159644000, loss_test=0.5033289970, acc_train=0.9943200000, acc_test=0.9191000000
+After epoch=120: loss train=0.0090851144, loss_test=0.4727151865, acc_train=0.9971400000, acc_test=0.9251000000
+cuda:0
+Files already downloaded and verified
+Files already downloaded and verified
+[INFO] STARTING TRAINING
+CIFAR10 resnet 18
+2025
+After epoch=1: loss train=1.4986281996, loss_test=1.4782988965, acc_train=0.4375200000, acc_test=0.4407000000
+After epoch=2: loss train=1.4664771850, loss_test=1.4516189762, acc_train=0.4826000000, acc_test=0.4971000000
+After epoch=3: loss train=1.3611356328, loss_test=1.3930085716, acc_train=0.5440200000, acc_test=0.5474000000
+After epoch=4: loss train=0.8032928004, loss_test=0.8317465714, acc_train=0.7153400000, acc_test=0.7105000000
+After epoch=5: loss train=0.9403795533, loss_test=1.0156203969, acc_train=0.6868600000, acc_test=0.6868000000
+After epoch=6: loss train=0.6168810405, loss_test=0.6769385764, acc_train=0.7858200000, acc_test=0.7705000000
+After epoch=7: loss train=0.5590251684, loss_test=0.6194127560, acc_train=0.8011000000, acc_test=0.7849000000
+After epoch=8: loss train=0.5221933043, loss_test=0.6121342522, acc_train=0.8158400000, acc_test=0.7932000000
+After epoch=9: loss train=0.4318562036, loss_test=0.5046626767, acc_train=0.8502200000, acc_test=0.8307000000
+After epoch=10: loss train=0.3969467671, loss_test=0.4694764065, acc_train=0.8598600000, acc_test=0.8347000000
+After epoch=11: loss train=0.3388533988, loss_test=0.4316445072, acc_train=0.8815800000, acc_test=0.8531000000
+After epoch=12: loss train=0.4832099158, loss_test=0.6266804507, acc_train=0.8328600000, acc_test=0.8060000000
+After epoch=13: loss train=0.3188949237, loss_test=0.4482358766, acc_train=0.8873000000, acc_test=0.8567000000
+After epoch=14: loss train=0.3142583357, loss_test=0.4493659374, acc_train=0.8909400000, acc_test=0.8601000000
+After epoch=15: loss train=0.2701235734, loss_test=0.4046813706, acc_train=0.9027400000, acc_test=0.8664000000
+After epoch=16: loss train=0.2682364563, loss_test=0.4101440095, acc_train=0.9045000000, acc_test=0.8643000000
+After epoch=17: loss train=0.2466211933, loss_test=0.4075142324, acc_train=0.9117000000, acc_test=0.8714000000
+After epoch=18: loss train=0.2433847438, loss_test=0.4110985885, acc_train=0.9102600000, acc_test=0.8669000000
+After epoch=19: loss train=0.2437079341, loss_test=0.4090566677, acc_train=0.9152000000, acc_test=0.8726000000
+After epoch=20: loss train=0.2967298234, loss_test=0.4956128469, acc_train=0.8994200000, acc_test=0.8579000000
+After epoch=21: loss train=0.2125731917, loss_test=0.4183399326, acc_train=0.9253600000, acc_test=0.8746000000
+After epoch=22: loss train=0.2230258397, loss_test=0.4309274383, acc_train=0.9203200000, acc_test=0.8657000000
+After epoch=23: loss train=0.1559474880, loss_test=0.3736731148, acc_train=0.9436000000, acc_test=0.8902000000
+After epoch=24: loss train=0.1382363851, loss_test=0.3601911355, acc_train=0.9506600000, acc_test=0.8948000000
+After epoch=25: loss train=0.1643309444, loss_test=0.4189385621, acc_train=0.9420200000, acc_test=0.8867000000
+After epoch=26: loss train=0.1270767445, loss_test=0.3657200463, acc_train=0.9537200000, acc_test=0.8938000000
+After epoch=27: loss train=0.1253352847, loss_test=0.3756585978, acc_train=0.9558400000, acc_test=0.8946000000
+After epoch=28: loss train=0.0990744202, loss_test=0.3582489757, acc_train=0.9649400000, acc_test=0.9032000000
+After epoch=29: loss train=0.1473013178, loss_test=0.4182920767, acc_train=0.9473000000, acc_test=0.8859000000
+After epoch=30: loss train=0.0984302668, loss_test=0.3728442799, acc_train=0.9657400000, acc_test=0.9025000000
+After epoch=31: loss train=0.0962564696, loss_test=0.3623860118, acc_train=0.9650400000, acc_test=0.9040000000
+After epoch=32: loss train=0.0975509381, loss_test=0.3818147239, acc_train=0.9638000000, acc_test=0.8996000000
+After epoch=33: loss train=0.1539138672, loss_test=0.4857830288, acc_train=0.9459400000, acc_test=0.8802000000
+After epoch=34: loss train=0.0775962016, loss_test=0.4144256575, acc_train=0.9714200000, acc_test=0.9027000000
+After epoch=35: loss train=0.1308227274, loss_test=0.5117585155, acc_train=0.9552800000, acc_test=0.8876000000
+After epoch=36: loss train=0.0555100021, loss_test=0.3720249068, acc_train=0.9808800000, acc_test=0.9131000000
+After epoch=37: loss train=0.1449758780, loss_test=0.5345112112, acc_train=0.9531000000, acc_test=0.8775000000
+After epoch=38: loss train=0.0904774329, loss_test=0.4555201131, acc_train=0.9676400000, acc_test=0.9008000000
+After epoch=39: loss train=0.0732860325, loss_test=0.4268061706, acc_train=0.9742800000, acc_test=0.9016000000
+After epoch=40: loss train=0.0656313335, loss_test=0.4343028606, acc_train=0.9768400000, acc_test=0.9002000000
+After epoch=41: loss train=0.0470988977, loss_test=0.3694434859, acc_train=0.9841400000, acc_test=0.9108000000
+After epoch=42: loss train=0.0534314583, loss_test=0.3831078715, acc_train=0.9817200000, acc_test=0.9114000000
+After epoch=43: loss train=0.0606775981, loss_test=0.4406097522, acc_train=0.9779400000, acc_test=0.9044000000
+After epoch=44: loss train=0.0472319924, loss_test=0.4173129467, acc_train=0.9829000000, acc_test=0.9100000000
+After epoch=45: loss train=0.0344852827, loss_test=0.3860060981, acc_train=0.9879400000, acc_test=0.9140000000
+After epoch=46: loss train=0.0385895652, loss_test=0.3946666812, acc_train=0.9866600000, acc_test=0.9138000000
+After epoch=47: loss train=0.0438450434, loss_test=0.4184134340, acc_train=0.9851400000, acc_test=0.9093000000
+After epoch=48: loss train=0.0525017562, loss_test=0.4415506409, acc_train=0.9811800000, acc_test=0.9112000000
+After epoch=49: loss train=0.0361718185, loss_test=0.3799184708, acc_train=0.9874400000, acc_test=0.9156000000
+After epoch=50: loss train=0.0412692101, loss_test=0.4453723840, acc_train=0.9858000000, acc_test=0.9087000000
+After epoch=51: loss train=0.0611278871, loss_test=0.4848611866, acc_train=0.9786600000, acc_test=0.9023000000
+After epoch=52: loss train=0.0260036753, loss_test=0.3856068661, acc_train=0.9918000000, acc_test=0.9147000000
+After epoch=53: loss train=0.0293378504, loss_test=0.3996517400, acc_train=0.9903200000, acc_test=0.9141000000
+After epoch=54: loss train=0.0343346895, loss_test=0.4405249120, acc_train=0.9876600000, acc_test=0.9067000000
+After epoch=55: loss train=0.0236123635, loss_test=0.3943934429, acc_train=0.9920800000, acc_test=0.9181000000
+After epoch=56: loss train=0.0201266608, loss_test=0.4251955202, acc_train=0.9930200000, acc_test=0.9175000000
+After epoch=57: loss train=0.0227268506, loss_test=0.4065727897, acc_train=0.9922600000, acc_test=0.9191000000
+After epoch=58: loss train=0.0373027844, loss_test=0.4695887034, acc_train=0.9867000000, acc_test=0.9092000000
+After epoch=59: loss train=0.0463560917, loss_test=0.4898893629, acc_train=0.9835600000, acc_test=0.9074000000
+After epoch=60: loss train=0.0246497437, loss_test=0.4626099943, acc_train=0.9905600000, acc_test=0.9152000000
+After epoch=61: loss train=0.0298890084, loss_test=0.4438664264, acc_train=0.9894800000, acc_test=0.9110000000
+After epoch=62: loss train=0.0281485007, loss_test=0.4306591334, acc_train=0.9908400000, acc_test=0.9129000000
+After epoch=63: loss train=0.0433573942, loss_test=0.5081219326, acc_train=0.9857200000, acc_test=0.9080000000
+After epoch=64: loss train=0.0183588500, loss_test=0.4199685684, acc_train=0.9934800000, acc_test=0.9178000000
+After epoch=65: loss train=0.0219782037, loss_test=0.4185808507, acc_train=0.9927800000, acc_test=0.9175000000
+After epoch=66: loss train=0.0154553342, loss_test=0.4278709042, acc_train=0.9944200000, acc_test=0.9211000000
+After epoch=67: loss train=0.0287605384, loss_test=0.4610121016, acc_train=0.9903200000, acc_test=0.9143000000
+After epoch=68: loss train=0.0237336467, loss_test=0.4469194659, acc_train=0.9921600000, acc_test=0.9184000000
+After epoch=69: loss train=0.0220369597, loss_test=0.4414022575, acc_train=0.9933000000, acc_test=0.9171000000
+After epoch=70: loss train=0.0258404887, loss_test=0.4557417933, acc_train=0.9913000000, acc_test=0.9109000000
+After epoch=71: loss train=0.0194496555, loss_test=0.4495454061, acc_train=0.9933600000, acc_test=0.9153000000
+After epoch=72: loss train=0.0225112561, loss_test=0.4733149091, acc_train=0.9922600000, acc_test=0.9191000000
+After epoch=73: loss train=0.0209922514, loss_test=0.4615371587, acc_train=0.9930000000, acc_test=0.9153000000
+After epoch=74: loss train=0.0118872286, loss_test=0.4191365567, acc_train=0.9960600000, acc_test=0.9242000000
+After epoch=75: loss train=0.0324644983, loss_test=0.4911405431, acc_train=0.9887000000, acc_test=0.9161000000
+After epoch=76: loss train=0.0132040231, loss_test=0.4563017854, acc_train=0.9962000000, acc_test=0.9225000000
+After epoch=77: loss train=0.0330259377, loss_test=0.5248744005, acc_train=0.9887600000, acc_test=0.9136000000
+After epoch=78: loss train=0.0130493207, loss_test=0.4254353889, acc_train=0.9955200000, acc_test=0.9224000000
+After epoch=79: loss train=0.0157950033, loss_test=0.4133851985, acc_train=0.9949000000, acc_test=0.9205000000
+After epoch=80: loss train=0.0119146974, loss_test=0.4169736607, acc_train=0.9961200000, acc_test=0.9231000000
+After epoch=81: loss train=0.0163145749, loss_test=0.4763902994, acc_train=0.9938200000, acc_test=0.9174000000
+After epoch=82: loss train=0.0090316857, loss_test=0.4222861595, acc_train=0.9968200000, acc_test=0.9238000000
+After epoch=83: loss train=0.0172304763, loss_test=0.4846604142, acc_train=0.9941200000, acc_test=0.9180000000
+After epoch=84: loss train=0.0152285397, loss_test=0.4558469564, acc_train=0.9942800000, acc_test=0.9191000000
+After epoch=85: loss train=0.0106255734, loss_test=0.4425614241, acc_train=0.9963600000, acc_test=0.9199000000
+After epoch=86: loss train=0.0301236928, loss_test=0.4928912850, acc_train=0.9889600000, acc_test=0.9103000000
+After epoch=87: loss train=0.0137915425, loss_test=0.4785188745, acc_train=0.9955600000, acc_test=0.9198000000
+After epoch=88: loss train=0.0089935433, loss_test=0.4521748188, acc_train=0.9963800000, acc_test=0.9212000000
+After epoch=89: loss train=0.0183118640, loss_test=0.5242667557, acc_train=0.9933600000, acc_test=0.9147000000
+After epoch=90: loss train=0.0121930311, loss_test=0.4916358407, acc_train=0.9955600000, acc_test=0.9201000000
+After epoch=91: loss train=0.0122386965, loss_test=0.4599156448, acc_train=0.9961800000, acc_test=0.9217000000
+After epoch=92: loss train=0.1912103928, loss_test=0.7862588140, acc_train=0.9645200000, acc_test=0.8855000000
+After epoch=93: loss train=0.0110751705, loss_test=0.4678196437, acc_train=0.9964200000, acc_test=0.9218000000
+After epoch=94: loss train=0.0105784472, loss_test=0.5032671980, acc_train=0.9962200000, acc_test=0.9234000000
+After epoch=95: loss train=0.0088518806, loss_test=0.4556623657, acc_train=0.9966600000, acc_test=0.9248000000
+After epoch=96: loss train=0.0186599111, loss_test=0.5080595311, acc_train=0.9929600000, acc_test=0.9166000000
+After epoch=97: loss train=0.0205005493, loss_test=0.5195307933, acc_train=0.9923000000, acc_test=0.9141000000
+After epoch=98: loss train=0.0124552858, loss_test=0.5013787712, acc_train=0.9953400000, acc_test=0.9172000000
+After epoch=99: loss train=0.0129340342, loss_test=0.4552568963, acc_train=0.9951200000, acc_test=0.9221000000
+After epoch=100: loss train=0.0106237066, loss_test=0.4456127078, acc_train=0.9964200000, acc_test=0.9220000000
+After epoch=101: loss train=0.0058648218, loss_test=0.4463949493, acc_train=0.9981600000, acc_test=0.9277000000
+After epoch=102: loss train=0.0133168214, loss_test=0.4704336350, acc_train=0.9958400000, acc_test=0.9192000000
+After epoch=103: loss train=0.0108709872, loss_test=0.4386671525, acc_train=0.9963800000, acc_test=0.9186000000
+After epoch=104: loss train=0.0118852568, loss_test=0.5065383675, acc_train=0.9956200000, acc_test=0.9232000000
+After epoch=105: loss train=0.0051756481, loss_test=0.4597696023, acc_train=0.9983000000, acc_test=0.9277000000
+After epoch=106: loss train=0.0060378944, loss_test=0.4284393334, acc_train=0.9980400000, acc_test=0.9267000000
+After epoch=107: loss train=0.0170492469, loss_test=0.5097908627, acc_train=0.9935200000, acc_test=0.9170000000
+After epoch=108: loss train=0.0113270394, loss_test=0.4838916058, acc_train=0.9956600000, acc_test=0.9196000000
+After epoch=109: loss train=0.0105409586, loss_test=0.4451594296, acc_train=0.9962800000, acc_test=0.9228000000
+After epoch=110: loss train=0.0122531196, loss_test=0.4808201669, acc_train=0.9958400000, acc_test=0.9190000000
+After epoch=111: loss train=0.0090004525, loss_test=0.4443358347, acc_train=0.9970600000, acc_test=0.9279000000
+After epoch=112: loss train=0.0273391744, loss_test=0.5701395085, acc_train=0.9914200000, acc_test=0.9153000000
+After epoch=113: loss train=0.0102044628, loss_test=0.4958683355, acc_train=0.9966400000, acc_test=0.9212000000
+After epoch=114: loss train=0.0066026529, loss_test=0.4734810679, acc_train=0.9973200000, acc_test=0.9221000000
+After epoch=115: loss train=0.0111584644, loss_test=0.5079233818, acc_train=0.9961800000, acc_test=0.9200000000
+After epoch=116: loss train=0.0091766527, loss_test=0.5237038609, acc_train=0.9968600000, acc_test=0.9185000000
+After epoch=117: loss train=0.0101647347, loss_test=0.5201365517, acc_train=0.9961000000, acc_test=0.9219000000
+After epoch=118: loss train=0.0097023880, loss_test=0.4833881553, acc_train=0.9971000000, acc_test=0.9260000000
+After epoch=119: loss train=0.0054136381, loss_test=0.4718145108, acc_train=0.9983400000, acc_test=0.9258000000
+After epoch=120: loss train=0.0082361934, loss_test=0.4964757667, acc_train=0.9970000000, acc_test=0.9227000000
