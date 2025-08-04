@@ -2,7 +2,7 @@
 # coding: utf-8
 
 """
-Matrix factorization experiment με optimizers.py
+Matrix factorization experiment με optimizers_backup.py
 Δοκιμάζει όλες τις custom μεθόδους μας πλάι στα κλασικά GD/Nesterov/AdGD.
 """
 
@@ -12,7 +12,7 @@ import scipy.linalg as LA
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from optimizers import (
+from optimizers_backup import (
     Gd,
     Nesterov,
     Adgd,

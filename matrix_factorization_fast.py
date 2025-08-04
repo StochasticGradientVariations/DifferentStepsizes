@@ -2,7 +2,7 @@
 # coding: utf-8
 
 """
-Γρήγορη matrix factorization με optimizers.py
+Γρήγορη matrix factorization με optimizers_backup.py
 Μόνο οι επιλεγμένες μέθοδοι, με λιγότερες επαναλήψεις.
 """
 
@@ -12,7 +12,7 @@ import scipy.linalg as LA
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from optimizers import (
+from optimizers_backup import (
     Gd,
     Nesterov,
     Adgd,

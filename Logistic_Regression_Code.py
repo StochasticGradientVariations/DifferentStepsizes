@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.datasets import load_svmlight_file
 
-# NumPy‐based methods από το optimizers.py
-from optimizers import (
+# NumPy‐based methods από το optimizers_backup.py
+from optimizers_backup import (
     Gd,
     Nesterov,
     Adgd,

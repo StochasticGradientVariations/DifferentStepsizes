@@ -2,7 +2,7 @@
 # coding: utf-8
 
 """
-Matrix factorization experiment με optimizers.py
+Matrix factorization experiment με optimizers_backup.py
 Δοκιμάζει όλες τις custom μεθόδους μας πλάι στα κλασικά GD/Nesterov/AdGD,
 συμπεριλαμβάνοντας τις ADPG_Momentum, ADPG_Momentum2 και ADPG_Momentum3.
 """
@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.datasets import load_svmlight_file
 
-from optimizers import (
+from optimizers_backup import (
     Gd,
     Nesterov,
     Adgd,

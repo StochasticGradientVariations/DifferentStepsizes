@@ -7,8 +7,8 @@ import numpy.linalg as la
 import matplotlib.pyplot as plt
 from scipy.sparse import coo_matrix
 
-# Οι optimizers από το optimizers.py
-from optimizers import *
+# Οι optimizers από το optimizers_backup.py
+from optimizers_backup import *
 
 def load_movielens_u_data(path):
     df = pd.read_csv(path, sep='\t', names=['user','item','rating','ts'])

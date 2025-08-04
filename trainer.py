@@ -4,13 +4,15 @@ import time
 import numpy.linalg as la
 import matplotlib.pyplot as plt
 
+print_every = 30
+
 
 class Trainer:
     """
     Base class for experiments with logistic regression. Provides methods
     for running optimization methods, saving the logs and plotting the results.
     """
-    def __init__(self, grad_func, loss_func, t_max=np.inf, it_max=np.inf, output_size=500, tolerance=0):
+    def __init__(self, grad_func, loss_func, fmin=0, reg_param=0, prox_type="unconstrained", isVerbose=False, t_max=np.inf, it_max=np.inf, output_size=500, tolerance=0):
         if t_max is np.inf and it_max is np.inf:
             it_max = 100
             print('The number of iterations is set to 100.')
@@ -22,6 +24,15 @@ class Trainer:
         self.first_run = True
         self.tolerance = tolerance
         self.losses = None
+        self.isVerbose = isVerbose
+        self.prox_type = prox_type
+        self.reg_param = reg_param
+        # —–– new fields for tracking progress —––––
+        self.loss_hist = []  # tracks the loss value f(w) at each step
+        self.grad_norm_hist = []  # stores the gradient norm ∥∇f(w)∥ to monitor convergence
+        self.lr_hist = []  # keeps a record of the learning rate used at each iteration
+
+        self.fmin = fmin
     
     def run(self, w0):
         if self.first_run:
@@ -37,6 +48,8 @@ class Trainer:
                 break
             self.estimate_stepsize()
             self.w = self.step()
+            if self.isVerbose and self.it % print_every == 0:
+                print(self.it, la.norm(self.grad_func(self.w)), self.loss_func(self.w)-self.fmin)
 
             self.save_checkpoint()
 
@@ -75,12 +88,35 @@ class Trainer:
         if (max(self.time_progress, self.iterations_progress) > self.max_progress) or (self.it <= first_iterations):
             self.update_logs()
         self.max_progress = max(self.time_progress, self.iterations_progress)
-        
-    def update_logs(self):        
-        self.ws.append(self.w.copy())
-        self.ts.append(self.t)
-        self.its.append(self.it)
-    
+
+    def update_logs(self):
+        # self.ws.append(self.w.copy())
+        # self.ts.append(self.t)
+        # self.its.append(self.it)
+        # # —–– logging history after each iteration —––––
+        # self.loss_hist.append(self.loss_func(self.w))  # log current loss value
+        # self.grad_norm_hist.append(la.norm(self.grad))  # record gradient norm to track optimization progress
+        # self.lr_hist.append(getattr(self, 'lr', None))  # save the learning rate used (if defined)
+        # record current parameter state and time info
+        self.ws.append(self.w.copy())    # save current weights
+        self.ts.append(self.t)           # save current timestamp or t-value
+        self.its.append(self.it)         # log current iteration count
+
+        # —–– track optimization history —––––
+        # 1) loss value at current step
+        self.loss_hist.append(self.loss_func(self.w))
+
+        # 2) gradient norm, only if gradient is already available
+        if hasattr(self, 'grad'):
+            self.grad_norm_hist.append(la.norm(self.grad))  # log gradient norm
+        else:
+            self.grad_norm_hist.append(None)  # store None initially if grad hasn't been computed yet
+
+        # 3) learning rate, if defined
+        self.lr_hist.append(getattr(self, 'lr', None))  # grab current learning rate or None
+
+
+
     def compute_loss_on_iterates(self):
         self.losses = np.array([self.loss_func(w) for w in self.ws])
     
