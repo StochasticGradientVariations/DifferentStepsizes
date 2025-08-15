@@ -1,0 +1,36 @@
+MNIST (digits) simple NN
+self.device=device(type='cuda', index=0)
+self.optimizer=SGD (
+Parameter Group 0
+    dampening: 0
+    differentiable: False
+    foreach: None
+    lr: 0.5623413251903491
+    maximize: False
+    momentum: 0.0
+    nesterov: False
+    weight_decay: 0
+)
+self.model=Simple NN (ReLU activations) with self.input_size=784, self.output_size=10, self.hidden_layers=[512, 256]
+self.loss_fn=CrossEntropyLoss()
+dataloader.batch_size=256
+dataloader.num_workers=4
+dataloader.dataset=Dataset MNIST
+    Number of datapoints: 60000
+    Root location: /data/leuven/376/vsc37669/data
+    Split: Train
+    StandardTransform
+Transform: Compose(
+               ToTensor()
+               Normalize(mean=(0.1307,), std=(0.3081,))
+           )
+self.seed=2022
+======================================================================================================================================================
+epoch=1, loss_train=0.12649184394072982, loss_test=0.1307085836306214, acc_train=0.9603333333333334, acc_test=0.9587
+epoch=2, loss_train=0.07760121066995118, loss_test=0.10815879413858055, acc_train=0.9753666666666667, acc_test=0.9655
+epoch=3, loss_train=0.05773422935224596, loss_test=0.09642868265509605, acc_train=0.98065, acc_test=0.9694
+epoch=4, loss_train=0.06582135646901231, loss_test=0.09124366408213973, acc_train=0.98045, acc_test=0.9722
+epoch=5, loss_train=0.018563273226089323, loss_test=0.06461243849480525, acc_train=0.99475, acc_test=0.9798
+epoch=6, loss_train=0.01358961967672122, loss_test=0.06437911133107263, acc_train=0.9965166666666667, acc_test=0.9817
+epoch=7, loss_train=0.02023468710125444, loss_test=0.08046493748988723, acc_train=0.9934333333333333, acc_test=0.9774
+epoch=8, loss_train=0.005511871417687133, loss_test=0.06188034111073648, acc_train=0.9988166666666667, acc_test=0.9837

@@ -1,0 +1,78 @@
+MNIST (digits) simple NN
+self.device=device(type='cuda', index=0)
+self.optimizer=SGD (
+Parameter Group 0
+    dampening: 0
+    differentiable: False
+    foreach: None
+    lr: 0.5623413251903491
+    maximize: False
+    momentum: 0.0
+    nesterov: False
+    weight_decay: 0
+)
+self.model=Simple NN (ReLU activations) with self.input_size=784, self.output_size=10, self.hidden_layers=[512, 256]
+self.loss_fn=CrossEntropyLoss()
+dataloader.batch_size=256
+dataloader.num_workers=4
+dataloader.dataset=Dataset MNIST
+    Number of datapoints: 60000
+    Root location: /data/leuven/376/vsc37669/data
+    Split: Train
+    StandardTransform
+Transform: Compose(
+               ToTensor()
+               Normalize(mean=(0.1307,), std=(0.3081,))
+           )
+self.seed=2023
+======================================================================================================================================================
+epoch=1, loss_train=0.22199573079322232, loss_test=0.25966551564633844, acc_train=0.9295833333333333, acc_test=0.9226
+epoch=2, loss_train=0.10676833877855162, loss_test=0.13378748651593927, acc_train=0.96345, acc_test=0.9548
+epoch=3, loss_train=0.05265527541570842, loss_test=0.08595041314692935, acc_train=0.9839666666666667, acc_test=0.9722
+epoch=4, loss_train=0.0514038322334911, loss_test=0.09172707027755679, acc_train=0.9831833333333333, acc_test=0.9694
+epoch=5, loss_train=0.019389603743725968, loss_test=0.06951277861080597, acc_train=0.9949, acc_test=0.9807
+epoch=6, loss_train=0.019244643031282625, loss_test=0.080316901858896, acc_train=0.9941833333333333, acc_test=0.9781
+epoch=7, loss_train=0.007461583452358681, loss_test=0.05891305408440532, acc_train=0.9981166666666667, acc_test=0.983
+epoch=8, loss_train=0.008095413355523363, loss_test=0.0659530612640083, acc_train=0.9979, acc_test=0.9835
+epoch=9, loss_train=0.005613712933994434, loss_test=0.06588080860674381, acc_train=0.99865, acc_test=0.9839
+epoch=10, loss_train=0.002138172496268724, loss_test=0.06509838671190664, acc_train=0.9997333333333334, acc_test=0.983
+epoch=11, loss_train=0.0009590433224381767, loss_test=0.06194698159815743, acc_train=0.9999666666666667, acc_test=0.9848
+epoch=12, loss_train=0.0007513865082960653, loss_test=0.06209777308395132, acc_train=0.9999666666666667, acc_test=0.9852
+epoch=13, loss_train=0.0005047758209873289, loss_test=0.06312577184826296, acc_train=1.0, acc_test=0.9856
+epoch=14, loss_train=0.0004293210902610456, loss_test=0.06372555232956076, acc_train=1.0, acc_test=0.9856
+epoch=15, loss_train=0.00036471359551874333, loss_test=0.06489437805721537, acc_train=1.0, acc_test=0.9857
+epoch=16, loss_train=0.0003284669858329198, loss_test=0.07124890026170759, acc_train=1.0, acc_test=0.9857
+epoch=17, loss_train=0.0002886062461952183, loss_test=0.06600704735028558, acc_train=1.0, acc_test=0.9857
+epoch=18, loss_train=0.0002634796105725245, loss_test=0.07980769379064441, acc_train=1.0, acc_test=0.9857
+epoch=19, loss_train=0.0002449597994161601, loss_test=0.06738545707605681, acc_train=1.0, acc_test=0.9856
+epoch=20, loss_train=0.00022598900536553295, loss_test=0.06788736791386328, acc_train=1.0, acc_test=0.9858
+epoch=21, loss_train=0.00021108488346068593, loss_test=0.06992506812966895, acc_train=1.0, acc_test=0.9855
+epoch=22, loss_train=0.00019551398942526933, loss_test=0.06863929442769959, acc_train=1.0, acc_test=0.9857
+epoch=23, loss_train=0.00018405820517998898, loss_test=0.0694087779993424, acc_train=1.0, acc_test=0.9856
+epoch=24, loss_train=0.00017414377095732595, loss_test=0.06962421521878352, acc_train=1.0, acc_test=0.9855
+epoch=25, loss_train=0.00016450908762945268, loss_test=0.07024426410207527, acc_train=1.0, acc_test=0.9855
+epoch=26, loss_train=0.00015585823599162428, loss_test=0.07071151202544572, acc_train=1.0, acc_test=0.9856
+epoch=27, loss_train=0.00014861051831951738, loss_test=0.07077129961653554, acc_train=1.0, acc_test=0.9854
+epoch=28, loss_train=0.00014183960137938327, loss_test=0.07122790012290352, acc_train=1.0, acc_test=0.9857
+epoch=29, loss_train=0.00013458793358988756, loss_test=0.0717612588137854, acc_train=1.0, acc_test=0.9856
+epoch=30, loss_train=0.00012855069374943033, loss_test=0.07188588122371585, acc_train=1.0, acc_test=0.9855
+epoch=31, loss_train=0.00012397247736907, loss_test=0.0721443566944558, acc_train=1.0, acc_test=0.9856
+epoch=32, loss_train=0.00011839395030736031, loss_test=0.07243121308911216, acc_train=1.0, acc_test=0.9855
+epoch=33, loss_train=0.00011395725970864888, loss_test=0.0728445775650471, acc_train=1.0, acc_test=0.9855
+epoch=34, loss_train=0.00010896282139893107, loss_test=0.07304941693046202, acc_train=1.0, acc_test=0.9855
+epoch=35, loss_train=0.00010540070900188249, loss_test=0.08335357679170556, acc_train=1.0, acc_test=0.9855
+epoch=36, loss_train=0.00010364118073645867, loss_test=0.07335480139585258, acc_train=1.0, acc_test=0.9856
+epoch=37, loss_train=9.842825620967719e-05, loss_test=0.0738697029883042, acc_train=1.0, acc_test=0.9855
+epoch=38, loss_train=9.487284188117938e-05, loss_test=0.07425287435762587, acc_train=1.0, acc_test=0.9856
+epoch=39, loss_train=9.186348756787649e-05, loss_test=0.07434047503738839, acc_train=1.0, acc_test=0.9855
+epoch=40, loss_train=8.92382929955505e-05, loss_test=0.07448177120859327, acc_train=1.0, acc_test=0.9855
+epoch=41, loss_train=8.692596700015244e-05, loss_test=0.07486277485859319, acc_train=1.0, acc_test=0.9856
+epoch=42, loss_train=8.382200627393296e-05, loss_test=0.07492474362693428, acc_train=1.0, acc_test=0.9856
+epoch=43, loss_train=8.161037894364626e-05, loss_test=0.0750917863333221, acc_train=1.0, acc_test=0.9857
+epoch=44, loss_train=7.903860491267628e-05, loss_test=0.07531074118160178, acc_train=1.0, acc_test=0.9857
+epoch=45, loss_train=7.678573060826588e-05, loss_test=0.0803024586792162, acc_train=1.0, acc_test=0.9856
+epoch=46, loss_train=7.491197230070188e-05, loss_test=0.07568427592359513, acc_train=1.0, acc_test=0.9856
+epoch=47, loss_train=7.307608404439533e-05, loss_test=0.0759335538765299, acc_train=1.0, acc_test=0.9856
+epoch=48, loss_train=7.10489974772691e-05, loss_test=0.07808957244269552, acc_train=1.0, acc_test=0.9857
+epoch=49, loss_train=6.94667576487731e-05, loss_test=0.08504611557364117, acc_train=1.0, acc_test=0.9856
+epoch=50, loss_train=6.755888924941403e-05, loss_test=0.08684281248133628, acc_train=1.0, acc_test=0.9857
