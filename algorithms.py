@@ -3,6 +3,7 @@ import scipy.linalg as LA
 import scipy.sparse as spr
 import scipy.sparse.linalg as spr_LA
 from time import perf_counter
+import scipy.linalg
 
 
 def safe_division(x, y):
@@ -310,3 +311,44 @@ def accel_str_gd(J, df, x0, la, mu, numb_iter=100):
     end = perf_counter()
     print("Time execution for accelerated GD:", end - begin)
     return np.array(values), x
+
+
+
+def adaptive_npgm_simple(f, df, prec, x0, la_0=1e-6, numb_iter=100, hist=None, verbose=False):
+    x = x0.copy()
+    x_old = x0.copy()
+    la_old = la_0
+    th = 1e9
+
+
+    grad0 = df(x)
+    prec_grad0 = prec.prec(df(x))
+    grad0_norm = scipy.linalg.norm(grad0)
+    scaling_old = scipy.linalg.norm(prec_grad0) / grad0_norm if grad0_norm != 0 else 0.0
+    prec_grad_old = prec_grad0.copy()
+
+    x = x - la_old * prec_grad_old
+
+    for i in range(1, numb_iter):
+        grad = df(x)
+        grad_norm = scipy.linalg.norm(grad)
+        prec_grad = prec.prec(df(x))
+        scaling = scipy.linalg.norm(prec_grad) / grad_norm
+        func_val = f(x)
+
+        norm_x = scipy.linalg.norm(x - x_old)
+        norm_prec_diff = scipy.linalg.norm(prec_grad - prec_grad_old)
+        Lk = norm_prec_diff / norm_x
+
+        la = min(np.sqrt((1+th) * scaling_old / scaling) * la_old, 0.5 / Lk)
+        th = la / la_old
+        x_old = x.copy()
+        x = x - la * prec_grad
+        la_old = la
+        prec_grad_old = prec_grad.copy()
+        scaling_old = scaling
+
+        hist.add(scipy.linalg.norm(grad), func_val, i)
+        if verbose and i % 50 == 0:
+            print("Iteration number " + str(i), scipy.linalg.norm(grad), func_val, np.linalg.norm(x))
+    return x
